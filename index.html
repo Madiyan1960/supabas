@@ -58,7 +58,7 @@
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
     async function loadProducts() {
-      const { data, error } = await supabase.from('Товары').select('*')
+      const { data, error } = await supabase.from('products').select('*')
 
       const container = document.getElementById('products')
       if (error || !data) {
