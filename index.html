@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Магазин</title>
   <style>
     body {
@@ -75,10 +75,15 @@
     }
     .cart-item span {
       flex: 1;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
     .cart-item button {
       margin: 0 0.2em;
-      padding: 0.2em 0.4em;
+      padding: 0.2em 0.5em;
+      font-weight: bold;
+      cursor: pointer;
     }
     .checkout {
       margin-top: 1em;
@@ -94,7 +99,7 @@
 </head>
 <body>
   <header>
-    <img src="https://via.placeholder.com/120x40?text=Logo" alt="Логотип">
+    <img src="https://via.placeholder.com/120x40?text=Logo" alt="Логотип" />
     <span>🛒 <strong id="cart-count">0</strong></span>
   </header>
 
@@ -104,7 +109,7 @@
     <h3>Корзина</h3>
     <div id="cart-items"></div>
     <p><strong>Сумма: <span id="cart-total">0</span> ₸</strong></p>
-    <button class="checkout" onclick="submitOrder()">Оформить заказ</button>
+    <button class="checkout" id="checkout-button">Оформить заказ</button>
   </div>
 
   <script type="module">
@@ -124,7 +129,7 @@
 
       const container = document.getElementById('products');
       if (error || !data) {
-        container.innerHTML = 'Ошибка загрузки товаров';
+        container.textContent = 'Ошибка загрузки товаров';
         console.error(error);
         return;
       }
@@ -134,12 +139,21 @@
         const card = document.createElement('div');
         card.className = 'card';
         card.innerHTML = `
-          <img src="${prod.image_url}" alt="${prod.name}">
+          <img src="${prod.image_url}" alt="${prod.name}" />
           <h4>${prod.name}</h4>
           <p>${prod.price} ₸</p>
-          <button onclick='addToCart(${JSON.stringify(prod)})'>В корзину</button>
+          <button class="add-to-cart-btn" data-id="${prod.id}">В корзину</button>
         `;
         container.appendChild(card);
+      });
+
+      // Назначаем обработчики после создания кнопок
+      document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-id');
+          const product = data.find(p => p.id == id);
+          if (product) addToCart(product);
+        });
       });
     }
 
@@ -162,15 +176,29 @@
         const div = document.createElement('div');
         div.className = 'cart-item';
         div.innerHTML = `
-          <span>${item.name} (${item.price}₸)</span>
-          <button onclick='changeQty(${item.id}, -1)'>−</button>
+          <span title="${item.name}">${item.name} (${item.price}₸)</span>
+          <button class="btn-minus" data-id="${item.id}">−</button>
           <span>${item.quantity}</span>
-          <button onclick='changeQty(${item.id}, 1)'>+</button>
+          <button class="btn-plus" data-id="${item.id}">+</button>
         `;
         container.appendChild(div);
       });
-      document.getElementById('cart-total').innerText = total;
-      document.getElementById('cart-count').innerText = cart.reduce((sum, i) => sum + i.quantity, 0);
+      document.getElementById('cart-total').textContent = total;
+      document.getElementById('cart-count').textContent = cart.reduce((sum, i) => sum + i.quantity, 0);
+
+      // Обработчики кнопок + и − в корзине
+      container.querySelectorAll('.btn-plus').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = parseInt(btn.getAttribute('data-id'));
+          changeQty(id, 1);
+        });
+      });
+      container.querySelectorAll('.btn-minus').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = parseInt(btn.getAttribute('data-id'));
+          changeQty(id, -1);
+        });
+      });
     }
 
     function changeQty(id, delta) {
@@ -184,9 +212,16 @@
     }
 
     async function submitOrder() {
-      const name = prompt("Ваше имя:");
-      const phone = prompt("Телефон:");
-      const address = prompt("Адрес:");
+      if (cart.length === 0) {
+        alert('Корзина пуста');
+        return;
+      }
+      const name = prompt('Ваше имя:');
+      if (!name) return alert('Введите имя');
+      const phone = prompt('Телефон:');
+      if (!phone) return alert('Введите телефон');
+      const address = prompt('Адрес:');
+      if (!address) return alert('Введите адрес');
 
       const products = cart.map(i => `${i.name} x${i.quantity} (${i.price}₸)`).join(', ');
       const total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
@@ -196,14 +231,16 @@
         .insert([{ name, phone, address, products, total }]);
 
       if (error) {
-        alert("Ошибка отправки заказа");
+        alert('Ошибка отправки заказа');
         console.error(error);
       } else {
-        alert("Заказ отправлен!");
+        alert('Заказ отправлен!');
         cart = [];
         updateCartUI();
       }
     }
+
+    document.getElementById('checkout-button').addEventListener('click', submitOrder);
 
     loadProducts();
   </script>
