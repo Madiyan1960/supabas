@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Магазин</title>
+  <link rel="manifest" href="manifest.json">
   <style>
     body {
       font-family: sans-serif;
@@ -33,7 +34,7 @@
       object-fit: cover;
       border-radius: 10px;
     }
-    .card button {
+    .card button, #checkoutBtn {
       margin-top: 0.5em;
       padding: 0.5em 1em;
       background: #28a745;
@@ -43,36 +44,21 @@
       cursor: pointer;
     }
     .cart {
-      position: fixed;
-      bottom: 0;
-      right: 0;
-      background: white;
+      margin-top: 2em;
       padding: 1em;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-      max-height: 50vh;
-      overflow-y: auto;
-      width: 100%;
-      max-width: 400px;
-      border-top-left-radius: 12px;
-    }
-    .cart h2 {
-      margin-top: 0;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
     .cart ul {
-      list-style: none;
       padding: 0;
+      list-style: none;
     }
     .cart li {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 0.5em;
-    }
-    .cart button {
-      background: #dc3545;
-      color: white;
-      border: none;
-      padding: 0.2em 0.5em;
-      cursor: pointer;
+      padding: 0.5em 0;
+      border-bottom: 1px solid #eee;
     }
   </style>
 </head>
@@ -80,48 +66,59 @@
   <h1>Товары</h1>
   <div class="grid" id="products">Загрузка...</div>
 
-  <div class="cart" id="cart">
+  <div class="cart">
     <h2>Корзина</h2>
-    <ul id="cart-items"></ul>
-    <p><strong>Итого:</strong> <span id="cart-total">0</span> ₸</p>
+    <ul id="cart-list"></ul>
+    <p><strong>Итого: <span id="total">0</span> ₸</strong></p>
+    <button id="checkoutBtn">Оформить заказ</button>
   </div>
 
   <script type="module">
     import { createClient } from 'https://esm.sh/@supabase/supabase-js'
 
     const SUPABASE_URL = 'https://kpefeonxvgnfpgevkcwy.supabase.co'
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtwZWZlb254dmduZnBnZXZrY3d5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyMzY4MDgsImV4cCI6MjA2MjgxMjgwOH0.aZJhwODNOS3FhyT8k-qAAfvo0NaYbv4QSm6SwuNaeys'
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-    const cart = {}
 
-    function updateCart() {
-      const cartItems = document.getElementById('cart-items')
-      const totalEl = document.getElementById('cart-total')
-      cartItems.innerHTML = ''
-      let total = 0
-      for (const name in cart) {
-        const item = cart[name]
-        total += item.price * item.qty
+    let cart = JSON.parse(localStorage.getItem('cart')) || []
+
+    function saveCart() {
+      localStorage.setItem('cart', JSON.stringify(cart))
+    }
+
+    function renderCart() {
+      const list = document.getElementById('cart-list')
+      const total = document.getElementById('total')
+      list.innerHTML = ''
+      let sum = 0
+      cart.forEach((item, index) => {
+        sum += item.price
         const li = document.createElement('li')
-        li.innerHTML = `${name} × ${item.qty} <button onclick="removeFromCart('${name}')">Удалить</button>`
-        cartItems.appendChild(li)
-      }
-      totalEl.textContent = total
+        li.innerHTML = `${item.name} — ${item.price} ₸ <button onclick="removeItem(${index})">✖</button>`
+        list.appendChild(li)
+      })
+      total.textContent = sum
     }
 
-    function addToCart(name, price) {
-      if (!cart[name]) cart[name] = { price, qty: 0 }
-      cart[name].qty++
-      updateCart()
+    function addToCart(item) {
+      cart.push(item)
+      saveCart()
+      renderCart()
     }
 
-    window.removeFromCart = (name) => {
-      if (cart[name]) {
-        cart[name].qty--
-        if (cart[name].qty <= 0) delete cart[name]
-        updateCart()
-      }
+    window.removeItem = function(index) {
+      cart.splice(index, 1)
+      saveCart()
+      renderCart()
+    }
+
+    document.getElementById('checkoutBtn').onclick = () => {
+      if (cart.length === 0) return alert('Корзина пуста')
+      alert('Спасибо за заказ!')
+      cart = []
+      saveCart()
+      renderCart()
     }
 
     async function loadProducts() {
@@ -132,6 +129,7 @@
         console.error(error)
         return
       }
+
       container.innerHTML = ''
       data.forEach(p => {
         const card = document.createElement('div')
@@ -140,14 +138,24 @@
           <img src="${p.image_url}" alt="${p.name}" />
           <h3>${p.name}</h3>
           <p>Цена: ${p.price} ₸</p>
-          <button onclick="addToCart('${p.name}', ${p.price})">Купить</button>
+          <button>Купить</button>
         `
+        card.querySelector('button').onclick = () => addToCart(p)
         container.appendChild(card)
       })
     }
 
-    window.addToCart = addToCart
+    renderCart()
     loadProducts()
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').then(() => {
+          console.log('Service Worker зарегистрирован')
+        })
+      })
+    }
   </script>
 </body>
 </html>
