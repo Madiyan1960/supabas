@@ -2,20 +2,18 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Магазин с корзиной и заказом</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Магазин с корзиной</title>
   <style>
     body {
       font-family: sans-serif;
       margin: 0;
       padding: 1em;
       background: #f9f9f9;
-      max-width: 900px;
-      margin-left: auto;
-      margin-right: auto;
     }
-    h1, h2 {
+    h1 {
       text-align: center;
+      margin-bottom: 1em;
     }
     .grid {
       display: grid;
@@ -46,241 +44,205 @@
       cursor: pointer;
     }
     #cart {
+      max-width: 600px;
+      margin: 0 auto 2em;
       background: #fff;
       padding: 1em;
       border-radius: 12px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      margin-bottom: 2em;
     }
     #cart h2 {
       margin-top: 0;
     }
     #cart-items {
       list-style: none;
-      padding-left: 0;
+      padding: 0;
+      margin: 0 0 1em 0;
     }
     #cart-items li {
-      margin-bottom: 0.5em;
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      margin-bottom: 0.5em;
     }
-    #cart-items button {
-      background: transparent;
-      border: none;
-      color: red;
+    #cart-total {
       font-weight: bold;
-      cursor: pointer;
-      font-size: 1.2em;
-      line-height: 1;
-    }
-    form {
-      background: #fff;
-      padding: 1em;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      text-align: right;
+      margin-bottom: 1em;
     }
     form label {
       display: block;
-      margin-top: 1em;
-      font-weight: bold;
+      margin: 0.5em 0 0.2em;
     }
     form input, form textarea {
       width: 100%;
       padding: 0.5em;
-      margin-top: 0.3em;
+      box-sizing: border-box;
       border-radius: 6px;
       border: 1px solid #ccc;
-      box-sizing: border-box;
+      margin-bottom: 1em;
     }
     form button {
-      margin-top: 1.5em;
-      padding: 0.7em 1.5em;
       background: #007bff;
       color: white;
       border: none;
+      padding: 0.7em 1.5em;
       border-radius: 6px;
       cursor: pointer;
       font-size: 1em;
     }
-    .total {
-      font-weight: bold;
-      margin-top: 1em;
-      font-size: 1.2em;
-      text-align: right;
-    }
-    .success-msg {
-      color: green;
-      font-weight: bold;
-      margin-top: 1em;
-      text-align: center;
-    }
-    .error-msg {
-      color: red;
-      font-weight: bold;
-      margin-top: 1em;
-      text-align: center;
-    }
   </style>
 </head>
 <body>
-  <h1>Магазин</h1>
-
-  <div class="grid" id="products">Загрузка товаров...</div>
+  <h1>Товары</h1>
+  <div class="grid" id="products">Загрузка...</div>
 
   <div id="cart">
     <h2>Корзина</h2>
     <ul id="cart-items"></ul>
-    <div class="total">Итого: <span id="cart-total">0</span> ₸</div>
-  </div>
+    <div id="cart-total">Итого: 0 ₸</div>
 
-  <form id="order-form">
-    <h2>Оформление заказа</h2>
-    <label for="name">Имя</label>
-    <input type="text" id="name" name="name" required />
-    <label for="phone">Телефон</label>
-    <input type="tel" id="phone" name="phone" required />
-    <label for="address">Адрес проживания</label>
-    <textarea id="address" name="address" required></textarea>
-    <button type="submit">Отправить заказ</button>
-    <div class="success-msg" id="success-msg" style="display:none;">Спасибо! Заказ отправлен.</div>
-    <div class="error-msg" id="error-msg" style="display:none;">Ошибка отправки заказа. Попробуйте позже.</div>
-  </form>
+    <h3>Оформление заказа</h3>
+    <form id="order-form">
+      <label for="name">Имя</label>
+      <input type="text" id="name" name="name" required />
+      <label for="phone">Телефон</label>
+      <input type="tel" id="phone" name="phone" required />
+      <label for="address">Адрес проживания</label>
+      <textarea id="address" name="address" rows="2" required></textarea>
+      <button type="submit">Отправить заказ</button>
+    </form>
+  </div>
 
   <script type="module">
     import { createClient } from 'https://esm.sh/@supabase/supabase-js'
 
-    // ЗАМЕНИ НА СВОИ ДАННЫЕ:
     const SUPABASE_URL = 'https://kpefeonxvgnfpgevkcwy.supabase.co'
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtwZWZlb254dmduZnBnZXZrY3d5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyMzY4MDgsImV4cCI6MjA2MjgxMjgwOH0.aZJhwODNOS3FhyT8k-qAAfvo0NaYbv4QSm6SwuNaeys'
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
     const productsContainer = document.getElementById('products')
-    const cartItemsContainer = document.getElementById('cart-items')
+    const cartItemsEl = document.getElementById('cart-items')
     const cartTotalEl = document.getElementById('cart-total')
     const orderForm = document.getElementById('order-form')
-    const successMsg = document.getElementById('success-msg')
-    const errorMsg = document.getElementById('error-msg')
 
-    let products = []
-    let cart = JSON.parse(localStorage.getItem('cart')) || {}
+    let cart = JSON.parse(localStorage.getItem('cart')) || []
 
     function saveCart() {
       localStorage.setItem('cart', JSON.stringify(cart))
     }
 
-    function renderCart() {
-      cartItemsContainer.innerHTML = ''
+    function updateCartUI() {
+      cartItemsEl.innerHTML = ''
       let total = 0
-      Object.entries(cart).forEach(([id, quantity]) => {
-        const product = products.find(p => String(p.id) === id)
-        if (!product) return
-        const itemTotal = product.price * quantity
-        total += itemTotal
 
+      cart.forEach(item => {
+        total += item.price * item.quantity
         const li = document.createElement('li')
-        li.textContent = `${product.name} x ${quantity} — ${itemTotal} ₸`
-
+        li.textContent = `${item.name} x${item.quantity} — ${item.price * item.quantity} ₸`
         const btnRemove = document.createElement('button')
         btnRemove.textContent = '×'
-        btnRemove.title = 'Удалить товар из корзины'
+        btnRemove.style.marginLeft = '1em'
+        btnRemove.style.background = 'transparent'
+        btnRemove.style.border = 'none'
+        btnRemove.style.color = 'red'
+        btnRemove.style.cursor = 'pointer'
         btnRemove.onclick = () => {
-          delete cart[id]
+          cart = cart.filter(ci => ci.id !== item.id)
           saveCart()
-          renderCart()
+          updateCartUI()
         }
         li.appendChild(btnRemove)
-
-        cartItemsContainer.appendChild(li)
+        cartItemsEl.appendChild(li)
       })
-      cartTotalEl.textContent = total
+
+      cartTotalEl.textContent = `Итого: ${total} ₸`
     }
 
-    function addToCart(id) {
-      id = String(id)
-      if (cart[id]) {
-        cart[id] += 1
+    function addToCart(product) {
+      const exist = cart.find(item => item.id === product.id)
+      if (exist) {
+        exist.quantity++
       } else {
-        cart[id] = 1
+        cart.push({...product, quantity: 1})
       }
       saveCart()
-      renderCart()
+      updateCartUI()
     }
 
     async function loadProducts() {
-      productsContainer.innerHTML = 'Загрузка товаров...'
+      productsContainer.textContent = 'Загрузка...'
       const { data, error } = await supabase
         .from('products')
         .select('id, name, price, image_url')
 
-      if (error || !data) {
-        productsContainer.innerHTML = '❌ Ошибка загрузки товаров'
+      if (error) {
+        productsContainer.textContent = '❌ Ошибка загрузки товаров'
         console.error('Ошибка Supabase:', error)
         return
       }
-      products = data
+
       productsContainer.innerHTML = ''
-      products.forEach(product => {
+      data.forEach(product => {
         const card = document.createElement('div')
         card.className = 'card'
         card.innerHTML = `
           <img src="${product.image_url}" alt="${product.name}">
           <h3>${product.name}</h3>
           <p>Цена: ${product.price} ₸</p>
-          <button>Добавить</button>
+          <button>В корзину</button>
         `
-        card.querySelector('button').onclick = () => addToCart(product.id)
+        card.querySelector('button').onclick = () => addToCart(product)
         productsContainer.appendChild(card)
       })
-      renderCart()
     }
 
-    orderForm.addEventListener('submit', async e => {
+    orderForm.addEventListener('submit', async (e) => {
       e.preventDefault()
-      successMsg.style.display = 'none'
-      errorMsg.style.display = 'none'
-
-      if (Object.keys(cart).length === 0) {
+      if (cart.length === 0) {
         alert('Корзина пуста!')
         return
       }
+      const name = orderForm.name.value.trim()
+      const phone = orderForm.phone.value.trim()
+      const address = orderForm.address.value.trim()
+      if (!name || !phone || !address) {
+        alert('Пожалуйста, заполните все поля.')
+        return
+      }
 
-      const formData = new FormData(orderForm)
-      const name = formData.get('name').trim()
-      const phone = formData.get('phone').trim()
-      const address = formData.get('address').trim()
+      const items = cart.map(item => ({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity
+      }))
 
-      let itemsList = []
-      let totalSum = 0
-      Object.entries(cart).forEach(([id, qty]) => {
-        const product = products.find(p => String(p.id) === id)
-        if (!product) return
-        itemsList.push(`${product.name} x ${qty}`)
-        totalSum += product.price * qty
-      })
+      const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
 
       const { error } = await supabase.from('orders').insert([{
         name,
         phone,
         address,
-        items: itemsList.join(', '),
-        total: totalSum,
+        items: JSON.stringify(items),
+        total,
         status: 'Новый'
       }])
 
       if (error) {
+        alert('Ошибка при отправке заказа: ' + error.message)
         console.error(error)
-        errorMsg.style.display = 'block'
-      } else {
-        successMsg.style.display = 'block'
-        cart = {}
-        saveCart()
-        renderCart()
-        orderForm.reset()
+        return
       }
+
+      alert('Спасибо за заказ! Мы свяжемся с вами.')
+      cart = []
+      saveCart()
+      updateCartUI()
+      orderForm.reset()
     })
 
+    updateCartUI()
     loadProducts()
   </script>
 </body>
