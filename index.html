@@ -9,38 +9,40 @@
       font-family: sans-serif;
       margin: 0;
       padding: 1em;
-      background: #f9f9f9;
+      background: #f5f5f5;
     }
     h1 {
       text-align: center;
     }
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
       gap: 1em;
       margin: 1em 0;
     }
     .card {
       background: #fff;
       border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      padding: 1em;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      padding: 0.5em;
       text-align: center;
+      position: relative;
     }
     .card img {
       width: 100%;
-      height: 130px;
+      height: 90px;
       object-fit: cover;
-      border-radius: 8px;
+      border-radius: 6px;
     }
     .card button {
       margin-top: 0.5em;
-      padding: 0.5em 1em;
+      padding: 0.4em 0.8em;
       background: #28a745;
       color: white;
       border: none;
       border-radius: 6px;
       cursor: pointer;
+      font-size: 0.9em;
     }
     .cart {
       background: #fff;
@@ -54,7 +56,20 @@
       padding: 0;
     }
     .cart li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       margin: 0.3em 0;
+    }
+    .qty-btn {
+      background: #007bff;
+      color: #fff;
+      border: none;
+      padding: 0.2em 0.5em;
+      font-size: 1em;
+      margin: 0 0.3em;
+      border-radius: 4px;
+      cursor: pointer;
     }
     form {
       margin-top: 1em;
@@ -73,6 +88,14 @@
       padding: 0.6em 1.2em;
       cursor: pointer;
       border-radius: 6px;
+    }
+
+    /* Анимация полёта */
+    .fly {
+      position: fixed;
+      z-index: 1000;
+      pointer-events: none;
+      transition: transform 0.8s ease-in-out, opacity 0.8s ease-in-out;
     }
   </style>
 </head>
@@ -123,20 +146,21 @@
         card.innerHTML = `
           <img src="${product.image_url}" alt="${product.name}">
           <h3>${product.name}</h3>
-          <p>Цена: ${product.price} ₸</p>
-          <button onclick='addToCart(${JSON.stringify(product)})'>Добавить</button>
+          <p>${product.price} ₸</p>
+          <button onclick='addToCart(${JSON.stringify(product)}, this)'>Добавить</button>
         `
         container.appendChild(card)
       })
     }
 
-    window.addToCart = (product) => {
+    window.addToCart = (product, btn) => {
       const existing = cart.find(p => p.id === product.id)
       if (existing) {
         existing.quantity += 1
       } else {
         cart.push({ ...product, quantity: 1 })
       }
+      flyToCart(btn)
       updateCartUI()
     }
 
@@ -156,12 +180,29 @@
 
       cart.forEach(item => {
         const li = document.createElement('li')
-        li.textContent = `${item.name} - ${item.price} ₸ × ${item.quantity}`
+        li.innerHTML = `
+          ${item.name} - ${item.price} ₸ × ${item.quantity}
+          <div>
+            <button class="qty-btn" onclick="changeQty(${item.id}, -1)">−</button>
+            <button class="qty-btn" onclick="changeQty(${item.id}, 1)">+</button>
+          </div>
+        `
         list.appendChild(li)
         totalSum += item.price * item.quantity
       })
 
       total.textContent = totalSum
+    }
+
+    window.changeQty = (id, delta) => {
+      const index = cart.findIndex(p => p.id === id)
+      if (index !== -1) {
+        cart[index].quantity += delta
+        if (cart[index].quantity <= 0) {
+          cart.splice(index, 1)
+        }
+        updateCartUI()
+      }
     }
 
     document.getElementById('order-form').addEventListener('submit', async (e) => {
@@ -189,6 +230,24 @@
         e.target.reset()
       }
     })
+
+    function flyToCart(button) {
+      const rect = button.getBoundingClientRect()
+      const fly = document.createElement('img')
+      fly.src = button.parentElement.querySelector('img').src
+      fly.className = 'fly'
+      fly.style.left = rect.left + 'px'
+      fly.style.top = rect.top + 'px'
+      fly.style.width = '40px'
+      document.body.appendChild(fly)
+
+      requestAnimationFrame(() => {
+        fly.style.transform = 'translate(200px, -200px) scale(0.2)'
+        fly.style.opacity = '0'
+      })
+
+      setTimeout(() => fly.remove(), 800)
+    }
 
     loadProducts()
   </script>
