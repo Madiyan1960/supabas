@@ -58,12 +58,12 @@
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
     async function loadProducts() {
-      const { data, error } = await supabase.from('products').select('*')
+      const { data, error } = await supabase.from('Товары').select('*')
 
       console.log('data:', data)
       console.log('error:', error)
 
-      const container = document.getElementById('products')
+      const container = document.getElementById('Товары')
       if (error || !data) {
         container.innerHTML = '❌ Ошибка загрузки товаров'
         return
