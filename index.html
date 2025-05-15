@@ -42,54 +42,104 @@
       border-radius: 6px;
       cursor: pointer;
     }
+    .cart {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #fff;
+      padding: 1em;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+      border-top: 1px solid #ccc;
+    }
+    .cart h2 {
+      margin: 0 0 0.5em;
+    }
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.2em 0;
+    }
   </style>
 </head>
 <body>
   <h1>Товары</h1>
   <div class="grid" id="products">Загрузка...</div>
 
+  <div class="cart" id="cart">
+    <h2>Корзина</h2>
+    <div id="cart-items"></div>
+    <p><strong>Итого: <span id="cart-total">0</span> ₸</strong></p>
+  </div>
+
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-    const SUPABASE_URL = 'https://kpefeonxvgnfpgevkcwy.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtwZWZlb254dmduZnBnZXZrY3d5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyMzY4MDgsImV4cCI6MjA2MjgxMjgwOH0.aZJhwODNOS3FhyT8k-qAAfvo0NaYbv4QSm6SwuNaeys';
+    const SUPABASE_URL = 'https://kpefeonxvgnfpgevkcwy.supabase.co'
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtwZWZlb254dmduZnBnZXZrY3d5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyMzY4MDgsImV4cCI6MjA2MjgxMjgwOH0.aZJhwODNOS3FhyT8k-qAAfvo0NaYbv4QSm6SwuNaeys'
 
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-    async function loadProducts() {
-      const container = document.getElementById('products');
-      container.innerHTML = 'Загрузка...';
+    const cart = JSON.parse(localStorage.getItem('cart') || '{}')
 
-      try {
-        const { data, error } = await supabase
-          .from('products')
-          .select('name, price, image_url');
-
-        if (error) throw error;
-        if (!data || data.length === 0) {
-          container.innerHTML = 'Нет товаров для отображения';
-          return;
-        }
-
-        container.innerHTML = '';
-        data.forEach(product => {
-          const card = document.createElement('div');
-          card.className = 'card';
-          card.innerHTML = `
-            <img src="${product.image_url}" alt="${product.name}">
-            <h3>${product.name}</h3>
-            <p>Цена: ${product.price} ₸</p>
-            <button onclick="alert('Вы выбрали: ${product.name}')">Купить</button>
-          `;
-          container.appendChild(card);
-        });
-      } catch (err) {
-        container.innerHTML = '❌ Ошибка загрузки товаров';
-        console.error('Ошибка Supabase:', err);
-      }
+    function saveCart() {
+      localStorage.setItem('cart', JSON.stringify(cart))
     }
 
-    loadProducts();
+    function updateCartUI() {
+      const cartItems = document.getElementById('cart-items')
+      const cartTotal = document.getElementById('cart-total')
+      cartItems.innerHTML = ''
+      let total = 0
+      for (const name in cart) {
+        const item = cart[name]
+        const line = document.createElement('div')
+        line.className = 'cart-item'
+        line.textContent = `${name} × ${item.count} = ${item.count * item.price} ₸`
+        cartItems.appendChild(line)
+        total += item.count * item.price
+      }
+      cartTotal.textContent = total
+    }
+
+    async function loadProducts() {
+      const container = document.getElementById('products')
+      container.innerHTML = 'Загрузка...'
+
+      const { data, error } = await supabase
+        .from('products')
+        .select('name, price, image_url')
+
+      if (error || !data) {
+        container.innerHTML = '❌ Ошибка загрузки товаров'
+        console.error('Ошибка Supabase:', error)
+        return
+      }
+
+      container.innerHTML = ''
+      data.forEach(product => {
+        const card = document.createElement('div')
+        card.className = 'card'
+        card.innerHTML = `
+          <img src="${product.image_url}" alt="${product.name}">
+          <h3>${product.name}</h3>
+          <p>Цена: ${product.price} ₸</p>
+          <button>Купить</button>
+        `
+        card.querySelector('button').onclick = () => {
+          if (!cart[product.name]) {
+            cart[product.name] = { count: 0, price: product.price }
+          }
+          cart[product.name].count++
+          saveCart()
+          updateCartUI()
+        }
+        container.appendChild(card)
+      })
+      updateCartUI()
+    }
+
+    loadProducts()
   </script>
 </body>
 </html>
