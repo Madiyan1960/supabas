@@ -51,21 +51,19 @@
   <script type="module">
     import { createClient } from 'https://esm.sh/@supabase/supabase-js'
 
-    // ⚠️ ЗАМЕНИ на свои данные из Supabase → Settings → API
+    // 🔒 Замените на свои данные из Supabase
     const SUPABASE_URL = 'https://kpefeonxvgnfpgevkcwy.supabase.co'
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtwZWZlb254dmduZnBnZXZrY3d5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyMzY4MDgsImV4cCI6MjA2MjgxMjgwOH0.aZJhwODNOS3FhyT8k-qAAfvo0NaYbv4QSm6SwuNaeys'
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
     async function loadProducts() {
-      const { data, error } = await supabase.from('Товары').select('*')
+      const { data, error } = await supabase.from('products').select('*')
 
-      console.log('data:', data)
-      console.log('error:', error)
-
-      const container = document.getElementById('Товары')
+      const container = document.getElementById('products')
       if (error || !data) {
         container.innerHTML = '❌ Ошибка загрузки товаров'
+        console.error(error)
         return
       }
 
@@ -74,7 +72,7 @@
         const card = document.createElement('div')
         card.className = 'card'
         card.innerHTML = `
-          <img src="${p.image}" alt="${p.name}" />
+          <img src="${p.image_url}" alt="${p.name}" />
           <h3>${p.name}</h3>
           <p>Цена: ${p.price} ₸</p>
           <button onclick="alert('Вы выбрали: ${p.name}')">Купить</button>
