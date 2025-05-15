@@ -60,7 +60,7 @@
     async function loadProducts() {
       const { data, error } = await supabase.from('Товары').select('*')
 
-      const container = document.getElementById('Товары')
+      const container = document.getElementById('products')
       if (error || !data) {
         container.innerHTML = '❌ Ошибка загрузки товаров'
         console.error(error)
