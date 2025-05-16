@@ -4,6 +4,10 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Магазин на Supabase</title>
+  <link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#2a9d8f" />
+<link rel="icon" href="icon-192.png" />
+
 <style>
   body { font-family: Arial, sans-serif; margin: 10px; background: #f9f9f9; }
   h1 { text-align: center; }
@@ -245,6 +249,11 @@ orderForm.onsubmit = async e => {
 
 loadProducts();
 updateCartUI();
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js')
+    .then(() => console.log('✅ Service Worker зарегистрирован'))
+    .catch(e => console.error('❌ Ошибка регистрации Service Worker:', e));
+}
 
 </script>
 </body>
