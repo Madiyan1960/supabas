@@ -170,28 +170,47 @@ orderForm.onsubmit = async e => {
   const name = document.getElementById('name').value.trim();
   const phone = document.getElementById('phone').value.trim();
   const address = document.getElementById('address').value.trim();
+
   if (!name || !phone || !address) {
     alert('Пожалуйста, заполните все поля.');
     return;
   }
+
   const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
-  try {
-    const { data, error } = await supabase.from('orders').insert([{
+  if (total === 0) {
+    alert('Сумма заказа не может быть нулевой.');
+    return;
+  }
+
+  // Преобразуем товары в читаемый текст
+  const productsText = cart.map(item => 
+    `${item.name} (${item.price} ₸) — ${item.qty} шт`
+  ).join('\n');
+
+  messageDiv.textContent = 'Отправка заказа...';
+  const { data, error } = await supabase.from('orders').insert([
+    {
       name,
       phone,
       address,
-      products: JSON.stringify(cart.map(({id, name, price, qty}) => ({id, name, price, qty}))),
+      products: productsText,  // Сохраняем текст
       total
-    }]);
-    if (error) throw error;
-    messageDiv.textContent = 'Заказ успешно отправлен!';
+    }
+  ]);
+
+  if (error) {
+    messageDiv.style.color = 'red';
+    messageDiv.textContent = 'Ошибка при отправке заказа: ' + error.message;
+    console.error(error);
+  } else {
+    messageDiv.style.color = 'green';
+    messageDiv.textContent = 'Заказ успешно отправлен! Спасибо.';
     cart = [];
     updateCartUI();
     orderForm.reset();
-  } catch (err) {
-    alert('Ошибка при отправке заказа: ' + err.message);
   }
-}
+};
+
 
 loadProducts();
 updateCartUI();
