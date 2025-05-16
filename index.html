@@ -5,126 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Магазин на Supabase</title>
 <style>
-  body {
-    font-family: Arial, sans-serif;
-    margin: 10px;
-    background: #f9f9f9;
-  }
-  h1 {
-    text-align: center;
-  }
-  #products {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
-  }
-  .product-card {
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 8px;
-    width: 150px;
-    background: #fff;
-    box-shadow: 0 0 5px rgba(0,0,0,0.1);
-    text-align: center;
-  }
-  .product-card img {
-    max-width: 100%;
-    height: 100px;
-    object-fit: contain;
-  }
-  .product-name {
-    font-weight: bold;
-    margin: 5px 0 3px 0;
-  }
-  .product-price {
-    color: #333;
-    margin-bottom: 5px;
-  }
-  button {
-    background: #2a9d8f;
-    color: white;
-    border: none;
-    padding: 6px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  button:hover {
-    background: #21867a;
-  }
-  #cart {
-    position: fixed;
-    right: 10px;
-    top: 10px;
-    width: 320px;
-    max-height: 85vh;
-    overflow-y: auto;
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 10px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.2);
-    font-size: 14px;
-  }
-  #cart h2 {
-    margin-top: 0;
-    text-align: center;
-  }
-  #logo {
-    display: block;
-    margin: 0 auto 10px;
-    max-width: 100px;
-  }
-  .cart-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 6px;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 5px;
-  }
-  .cart-item-name {
-    flex: 1 1 auto;
-  }
-  .cart-item-qty {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-  .cart-item-qty button {
-    width: 26px;
-    height: 26px;
-    font-weight: bold;
-    padding: 0;
-    line-height: 1;
-    border-radius: 4px;
-  }
-  #total {
-    font-weight: bold;
-    text-align: right;
-    margin-top: 10px;
-  }
-  #orderForm {
-    margin-top: 10px;
-  }
-  #orderForm input, #orderForm textarea {
-    width: 100%;
-    box-sizing: border-box;
-    margin-bottom: 8px;
-    padding: 6px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  #orderForm button {
-    width: 100%;
-    font-size: 16px;
-  }
-  #message {
-    text-align: center;
-    color: green;
-    margin-top: 8px;
-  }
+  body { font-family: Arial, sans-serif; margin: 10px; background: #f9f9f9; }
+  h1 { text-align: center; }
+  #products { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+  .product-card { border: 1px solid #ddd; border-radius: 5px; padding: 8px; width: 150px; background: #fff; box-shadow: 0 0 5px rgba(0,0,0,0.1); text-align: center; }
+  .product-card img { max-width: 100%; height: 100px; object-fit: contain; }
+  .product-name { font-weight: bold; margin: 5px 0 3px 0; }
+  .product-price { color: #333; margin-bottom: 5px; }
+  button { background: #2a9d8f; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; }
+  button:hover { background: #21867a; }
+  #cart { position: fixed; right: 10px; top: 10px; width: 320px; max-height: 85vh; overflow-y: auto; background: white; border: 1px solid #ccc; border-radius: 8px; padding: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.2); font-size: 14px; }
+  #cart h2 { margin-top: 0; text-align: center; }
+  #logo { display: block; margin: 0 auto 10px; max-width: 100px; }
+  .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+  .cart-item-name { flex: 1 1 auto; }
+  .cart-item-qty { display: flex; align-items: center; gap: 5px; }
+  .cart-item-qty button { width: 26px; height: 26px; font-weight: bold; padding: 0; line-height: 1; border-radius: 4px; }
+  #total { font-weight: bold; text-align: right; margin-top: 10px; }
+  #orderForm { margin-top: 10px; }
+  #orderForm input, #orderForm textarea { width: 100%; box-sizing: border-box; margin-bottom: 8px; padding: 6px; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; }
+  #orderForm button { width: 100%; font-size: 16px; }
+  #message { text-align: center; color: green; margin-top: 8px; }
 </style>
 </head>
 <body>
@@ -152,7 +53,7 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
 const SUPABASE_URL = 'https://kpefeonxvgnfpgevkcwy.supabase.co'
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtwZWZlb254dmduZnBnZXZrY3d5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyMzY4MDgsImV4cCI6MjA2MjgxMjgwOH0.aZJhwODNOS3FhyT8k-qAAfvo0NaYbv4QSm6SwuNaeys'  // <== Вставьте сюда ваш anon ключ Supabase
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtwZWZlb254dmduZnBnZXZrY3d5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyMzY4MDgsImV4cCI6MjA2MjgxMjgwOH0.aZJhwODNOS3FhyT8k-qAAfvo0NaYbv4QSm6SwuNaeys'
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -170,7 +71,6 @@ async function loadProducts() {
   const { data, error } = await supabase
     .from('products')
     .select('id,name,price,image_url');
-
   if (error) {
     productsContainer.textContent = 'Ошибка загрузки товаров';
     console.error(error);
@@ -195,8 +95,7 @@ function renderProducts() {
       <div class="product-price">${p.price} ₸</div>
       <button data-id="${p.id}">Добавить в корзину</button>
     `;
-    const btn = card.querySelector('button');
-    btn.addEventListener('click', () => addToCart(p.id));
+    card.querySelector('button').addEventListener('click', () => addToCart(p.id));
     productsContainer.appendChild(card);
   });
 }
@@ -235,7 +134,7 @@ function updateCartUI() {
   });
 
   const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
-  totalDiv.textContent = `Итого: ${total}`;
+  totalDiv.textContent = `Итого: ${total} ₸`;
 
   cartItemsContainer.querySelectorAll('button.inc').forEach(btn => {
     btn.onclick = () => {
@@ -271,46 +170,32 @@ orderForm.onsubmit = async e => {
   const name = document.getElementById('name').value.trim();
   const phone = document.getElementById('phone').value.trim();
   const address = document.getElementById('address').value.trim();
-
   if (!name || !phone || !address) {
     alert('Пожалуйста, заполните все поля.');
     return;
   }
-
   const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
-  if (total === 0) {
-    alert('Сумма заказа не может быть нулевой.');
-    return;
-  }
-
-  const productsForOrder = cart.map(({id, name, price, qty}) => ({id, name, price, qty}));
-
-  messageDiv.textContent = 'Отправка заказа...';
-  const { data, error } = await supabase.from('orders').insert([
-    {
+  try {
+    const { data, error } = await supabase.from('orders').insert([{
       name,
       phone,
       address,
-      products: productsForOrder,
+      products: JSON.stringify(cart.map(({id, name, price, qty}) => ({id, name, price, qty}))),
       total
-    }
-  ]);
-
-  if (error) {
-    messageDiv.style.color = 'red';
-    messageDiv.textContent = 'Ошибка при отправке заказа: ' + error.message;
-    console.error(error);
-  } else {
-    messageDiv.style.color = 'green';
-    messageDiv.textContent = 'Заказ успешно отправлен! Спасибо.';
+    }]);
+    if (error) throw error;
+    messageDiv.textContent = 'Заказ успешно отправлен!';
     cart = [];
     updateCartUI();
     orderForm.reset();
+  } catch (err) {
+    alert('Ошибка при отправке заказа: ' + err.message);
   }
-};
+}
 
 loadProducts();
-</script>
+updateCartUI();
 
+</script>
 </body>
 </html>
