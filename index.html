@@ -2,163 +2,123 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Магазин</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Магазин у дома</title>
   <style>
     body {
       font-family: sans-serif;
       margin: 0;
-      background: #f4f4f4;
+      padding: 1rem;
+      background: #f8f8f8;
     }
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1em;
-      background: #343a40;
-      color: white;
+
+    h1 {
+      text-align: center;
     }
-    header img {
-      height: 40px;
-    }
-    .grid {
+
+    .products {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      gap: 1em;
-      padding: 1em;
+      gap: 1rem;
     }
-    .card {
+
+    .product {
       background: white;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      padding: 0.5rem;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
       text-align: center;
-      padding: 0.5em;
-      font-size: 0.9em;
+      font-size: 14px;
     }
-    .card img {
-      width: 100%;
+
+    .product img {
+      width: 100px;
       height: 100px;
       object-fit: cover;
-      border-radius: 8px;
+      margin-bottom: 0.5rem;
     }
-    .card button {
-      margin-top: 0.5em;
+
+    .product button {
+      padding: 0.3rem 0.5rem;
+      margin-top: 0.5rem;
+      border: none;
       background: #28a745;
       color: white;
-      border: none;
       border-radius: 6px;
-      padding: 0.3em 0.6em;
       cursor: pointer;
     }
-    .cart {
-      position: fixed;
-      right: 1em;
-      bottom: 1em;
+
+    #cart {
+      margin-top: 1.5rem;
+      padding: 1rem;
       background: white;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      padding: 1em;
-      width: 280px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
-      font-size: 0.9em;
-      z-index: 1000;
+      border-radius: 12px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
-    .cart h3 {
-      margin-top: 0;
-      font-size: 1.1em;
-    }
+
     .cart-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin: 0.5em 0;
+      margin-bottom: 8px;
     }
+
     .cart-item span {
-      flex: 1;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
+      margin-right: 10px;
     }
+
     .cart-item button {
-      margin: 0 0.2em;
-      padding: 0.2em 0.5em;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .checkout {
-      margin-top: 1em;
-      width: 100%;
-      padding: 0.5em;
+      width: 28px;
+      height: 28px;
+      font-size: 16px;
+      margin: 0 3px;
+      border: none;
+      border-radius: 4px;
       background: #007bff;
       color: white;
-      border: none;
-      border-radius: 6px;
       cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <header>
-    <img src="https://via.placeholder.com/120x40?text=Logo" alt="Логотип" />
-    <span>🛒 <strong id="cart-count">0</strong></span>
-  </header>
 
-  <div class="grid" id="products">Загрузка...</div>
+  <h1>🛒 Магазин у дома</h1>
 
-  <div class="cart" id="cart">
-    <h3>Корзина</h3>
-    <div id="cart-items"></div>
-    <p><strong>Сумма: <span id="cart-total">0</span> ₸</strong></p>
-    <button class="checkout" id="checkout-button">Оформить заказ</button>
+  <div class="products" id="product-list"></div>
+
+  <div id="cart">
+    <strong>Корзина пуста</strong>
   </div>
 
-  <script type="module">
-    import { createClient } from 'https://esm.sh/@supabase/supabase-js'
-
-    const supabase = createClient(
-      'https://kpefeonxvgnfpgevkcwy.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtwZWZlb254dmduZnBnZXZrY3d5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyMzY4MDgsImV4cCI6MjA2MjgxMjgwOH0.aZJhwODNOS3FhyT8k-qAAfvo0NaYbv4QSm6SwuNaeys'
-    );
+  <script>
+    const products = [
+      { id: 1, name: "Хлеб", price: 150, image: "https://via.placeholder.com/100?text=Хлеб" },
+      { id: 2, name: "Молоко", price: 290, image: "https://via.placeholder.com/100?text=Молоко" },
+      { id: 3, name: "Яйца", price: 500, image: "https://via.placeholder.com/100?text=Яйца" },
+      { id: 4, name: "Масло", price: 800, image: "https://via.placeholder.com/100?text=Масло" },
+    ];
 
     let cart = [];
 
-    async function loadProducts() {
-      const { data, error } = await supabase
-        .from('products')
-        .select('id, name, price, image_url');
-
-      const container = document.getElementById('products');
-      if (error || !data) {
-        container.textContent = 'Ошибка загрузки товаров';
-        console.error(error);
-        return;
-      }
-
-      container.innerHTML = '';
-      data.forEach(prod => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-          <img src="${prod.image_url}" alt="${prod.name}" />
-          <h4>${prod.name}</h4>
-          <p>${prod.price} ₸</p>
-          <button class="add-to-cart-btn" data-id="${prod.id}">В корзину</button>
+    function renderProducts() {
+      const list = document.getElementById("product-list");
+      list.innerHTML = "";
+      products.forEach(product => {
+        const div = document.createElement("div");
+        div.className = "product";
+        div.innerHTML = `
+          <img src="${product.image}" alt="${product.name}" />
+          <div>${product.name}</div>
+          <div>${product.price} ₸</div>
+          <button onclick="addToCart(${product.id})">В корзину</button>
         `;
-        container.appendChild(card);
-      });
-
-      // Назначаем обработчики после создания кнопок
-      document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const id = btn.getAttribute('data-id');
-          const product = data.find(p => p.id == id);
-          if (product) addToCart(product);
-        });
+        list.appendChild(div);
       });
     }
 
-    function addToCart(product) {
-      const item = cart.find(i => i.id === product.id);
+    function addToCart(id) {
+      const product = products.find(p => p.id === id);
+      const item = cart.find(p => p.id === id);
       if (item) {
         item.quantity += 1;
       } else {
@@ -167,82 +127,57 @@
       updateCartUI();
     }
 
-    function updateCartUI() {
-      const container = document.getElementById('cart-items');
-      container.innerHTML = '';
-      let total = 0;
-      cart.forEach(item => {
-        total += item.price * item.quantity;
-        const div = document.createElement('div');
-        div.className = 'cart-item';
-        div.innerHTML = `
-          <span title="${item.name}">${item.name} (${item.price}₸)</span>
-          <button class="btn-minus" data-id="${item.id}">−</button>
-          <span>${item.quantity}</span>
-          <button class="btn-plus" data-id="${item.id}">+</button>
-        `;
-        container.appendChild(div);
-      });
-      document.getElementById('cart-total').textContent = total;
-      document.getElementById('cart-count').textContent = cart.reduce((sum, i) => sum + i.quantity, 0);
-
-      // Обработчики кнопок + и − в корзине
-      container.querySelectorAll('.btn-plus').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const id = parseInt(btn.getAttribute('data-id'));
-          changeQty(id, 1);
-        });
-      });
-      container.querySelectorAll('.btn-minus').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const id = parseInt(btn.getAttribute('data-id'));
-          changeQty(id, -1);
-        });
-      });
-    }
-
-    function changeQty(id, delta) {
-      const item = cart.find(i => i.id === id);
-      if (!item) return;
-      item.quantity += delta;
-      if (item.quantity <= 0) {
-        cart = cart.filter(i => i.id !== id);
-      }
-      updateCartUI();
-    }
-
-    async function submitOrder() {
-      if (cart.length === 0) {
-        alert('Корзина пуста');
-        return;
-      }
-      const name = prompt('Ваше имя:');
-      if (!name) return alert('Введите имя');
-      const phone = prompt('Телефон:');
-      if (!phone) return alert('Введите телефон');
-      const address = prompt('Адрес:');
-      if (!address) return alert('Введите адрес');
-
-      const products = cart.map(i => `${i.name} x${i.quantity} (${i.price}₸)`).join(', ');
-      const total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
-
-      const { error } = await supabase
-        .from('orders')
-        .insert([{ name, phone, address, products, total }]);
-
-      if (error) {
-        alert('Ошибка отправки заказа');
-        console.error(error);
-      } else {
-        alert('Заказ отправлен!');
-        cart = [];
+    function increaseQuantity(id) {
+      const item = cart.find(p => p.id === id);
+      if (item) {
+        item.quantity += 1;
         updateCartUI();
       }
     }
 
-    document.getElementById('checkout-button').addEventListener('click', submitOrder);
+    function decreaseQuantity(id) {
+      const index = cart.findIndex(p => p.id === id);
+      if (index > -1) {
+        cart[index].quantity -= 1;
+        if (cart[index].quantity <= 0) {
+          cart.splice(index, 1);
+        }
+        updateCartUI();
+      }
+    }
 
-    loadProducts();
+    function updateCartUI() {
+      const cartEl = document.getElementById("cart");
+      cartEl.innerHTML = "";
+      if (cart.length === 0) {
+        cartEl.innerHTML = "<strong>Корзина пуста</strong>";
+        return;
+      }
+
+      cart.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "cart-item";
+        div.innerHTML = `
+          <span>${item.name}</span>
+          <span>${item.price} ₸</span>
+          <span>x${item.quantity}</span>
+          <div>
+            <button onclick="increaseQuantity(${item.id})">+</button>
+            <button onclick="decreaseQuantity(${item.id})">−</button>
+          </div>
+        `;
+        cartEl.appendChild(div);
+      });
+
+      const total = cart.reduce((sum, p) => sum + p.price * p.quantity, 0);
+      const totalDiv = document.createElement("div");
+      totalDiv.style.marginTop = "10px";
+      totalDiv.innerHTML = `<strong>Сумма: ${total} ₸</strong>`;
+      cartEl.appendChild(totalDiv);
+    }
+
+    renderProducts();
   </script>
+
 </body>
 </html>
