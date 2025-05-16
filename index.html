@@ -111,6 +111,31 @@ function addToCart(productId) {
   }
   updateCartUI();
 }
+function flyToCart(imgElement) {
+  const cartIcon = document.querySelector('#cart-icon'); // замените на актуальный селектор корзины
+  const imgClone = imgElement.cloneNode(true);
+  const imgRect = imgElement.getBoundingClientRect();
+  const cartRect = cartIcon.getBoundingClientRect();
+
+  imgClone.style.position = 'fixed';
+  imgClone.style.zIndex = '9999';
+  imgClone.style.left = imgRect.left + 'px';
+  imgClone.style.top = imgRect.top + 'px';
+  imgClone.style.width = imgRect.width + 'px';
+  imgClone.style.transition = 'all 0.8s ease-in-out';
+  document.body.appendChild(imgClone);
+
+  requestAnimationFrame(() => {
+    imgClone.style.left = cartRect.left + 'px';
+    imgClone.style.top = cartRect.top + 'px';
+    imgClone.style.width = '20px';
+    imgClone.style.opacity = '0.5';
+  });
+
+  setTimeout(() => {
+    imgClone.remove();
+  }, 800);
+}
 
 function updateCartUI() {
   if (cart.length === 0) {
