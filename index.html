@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Магазин с Supabase</title>
+<title>Магазин на Supabase</title>
 <style>
   body {
     font-family: Arial, sans-serif;
@@ -22,8 +22,8 @@
   .product-card {
     border: 1px solid #ddd;
     border-radius: 5px;
-    padding: 10px;
-    width: 150px; /* уменьшили на ~50% */
+    padding: 8px;
+    width: 150px;
     background: #fff;
     box-shadow: 0 0 5px rgba(0,0,0,0.1);
     text-align: center;
@@ -35,7 +35,7 @@
   }
   .product-name {
     font-weight: bold;
-    margin: 5px 0;
+    margin: 5px 0 3px 0;
   }
   .product-price {
     color: #333;
@@ -56,8 +56,8 @@
     position: fixed;
     right: 10px;
     top: 10px;
-    width: 300px;
-    max-height: 80vh;
+    width: 320px;
+    max-height: 85vh;
     overflow-y: auto;
     background: white;
     border: 1px solid #ccc;
@@ -70,11 +70,16 @@
     margin-top: 0;
     text-align: center;
   }
+  #logo {
+    display: block;
+    margin: 0 auto 10px;
+    max-width: 100px;
+  }
   .cart-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     border-bottom: 1px solid #eee;
     padding-bottom: 5px;
   }
@@ -87,11 +92,12 @@
     gap: 5px;
   }
   .cart-item-qty button {
-    width: 24px;
-    height: 24px;
+    width: 26px;
+    height: 26px;
     font-weight: bold;
     padding: 0;
     line-height: 1;
+    border-radius: 4px;
   }
   #total {
     font-weight: bold;
@@ -107,15 +113,12 @@
     margin-bottom: 8px;
     padding: 6px;
     font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
   }
   #orderForm button {
     width: 100%;
     font-size: 16px;
-  }
-  #logo {
-    display: block;
-    margin: 0 auto 10px;
-    max-width: 100px;
   }
   #message {
     text-align: center;
@@ -145,11 +148,11 @@
 </div>
 
 <script type="module">
-// Инициализация Supabase
+// Подключение Supabase
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
 const SUPABASE_URL = 'https://kpefeonxvgnfpgevkcwy.supabase.co'
-const SUPABASE_ANON_KEY = 'твой_anon_ключ_сюда'  // <-- вставь сюда свой anon key
+const SUPABASE_ANON_KEY = 'ВАШ_ANON_KEY_ЗДЕСЬ'  // <== Вставьте сюда ваш anon ключ Supabase
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -187,4 +190,127 @@ function renderProducts() {
     const card = document.createElement('div');
     card.className = 'product-card';
     card.innerHTML = `
-      <img src="${p.image
+      <img src="${p.image_url || ''}" alt="${p.name}" />
+      <div class="product-name">${p.name}</div>
+      <div class="product-price">${p.price} ₸</div>
+      <button data-id="${p.id}">Добавить в корзину</button>
+    `;
+    const btn = card.querySelector('button');
+    btn.addEventListener('click', () => addToCart(p.id));
+    productsContainer.appendChild(card);
+  });
+}
+
+function addToCart(productId) {
+  const product = products.find(p => p.id === productId);
+  if (!product) return;
+  const item = cart.find(c => c.id === productId);
+  if (item) {
+    item.qty++;
+  } else {
+    cart.push({...product, qty: 1});
+  }
+  updateCartUI();
+}
+
+function updateCartUI() {
+  if (cart.length === 0) {
+    cartItemsContainer.textContent = 'Корзина пуста';
+    totalDiv.textContent = 'Итого: 0';
+    return;
+  }
+  cartItemsContainer.innerHTML = '';
+  cart.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'cart-item';
+    div.innerHTML = `
+      <div class="cart-item-name">${item.name} (${item.price} ₸)</div>
+      <div class="cart-item-qty">
+        <button class="dec" data-id="${item.id}">-</button>
+        <div>${item.qty}</div>
+        <button class="inc" data-id="${item.id}">+</button>
+      </div>
+    `;
+    cartItemsContainer.appendChild(div);
+  });
+
+  const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+  totalDiv.textContent = `Итого: ${total}`;
+
+  cartItemsContainer.querySelectorAll('button.inc').forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.getAttribute('data-id');
+      const item = cart.find(c => c.id == id);
+      if (item) {
+        item.qty++;
+        updateCartUI();
+      }
+    };
+  });
+  cartItemsContainer.querySelectorAll('button.dec').forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.getAttribute('data-id');
+      const item = cart.find(c => c.id == id);
+      if (item) {
+        item.qty--;
+        if (item.qty <= 0) {
+          cart = cart.filter(c => c.id != id);
+        }
+        updateCartUI();
+      }
+    };
+  });
+}
+
+orderForm.onsubmit = async e => {
+  e.preventDefault();
+  if (cart.length === 0) {
+    alert('Корзина пуста!');
+    return;
+  }
+  const name = document.getElementById('name').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const address = document.getElementById('address').value.trim();
+
+  if (!name || !phone || !address) {
+    alert('Пожалуйста, заполните все поля.');
+    return;
+  }
+
+  const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+  if (total === 0) {
+    alert('Сумма заказа не может быть нулевой.');
+    return;
+  }
+
+  const productsForOrder = cart.map(({id, name, price, qty}) => ({id, name, price, qty}));
+
+  messageDiv.textContent = 'Отправка заказа...';
+  const { data, error } = await supabase.from('orders').insert([
+    {
+      name,
+      phone,
+      address,
+      products: productsForOrder,
+      total
+    }
+  ]);
+
+  if (error) {
+    messageDiv.style.color = 'red';
+    messageDiv.textContent = 'Ошибка при отправке заказа: ' + error.message;
+    console.error(error);
+  } else {
+    messageDiv.style.color = 'green';
+    messageDiv.textContent = 'Заказ успешно отправлен! Спасибо.';
+    cart = [];
+    updateCartUI();
+    orderForm.reset();
+  }
+};
+
+loadProducts();
+</script>
+
+</body>
+</html>
