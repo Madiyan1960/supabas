@@ -332,28 +332,28 @@
       renderProducts(filteredProducts);
     }
 
-   function flyToCart(img) {
+  function flyToCart(img) {
   const flyingImg = img.cloneNode(true);
   flyingImg.classList.add('flying-img');
   document.body.appendChild(flyingImg);
 
-  // Получаем координаты картинки на экране с учётом прокрутки
   const imgRect = img.getBoundingClientRect();
 
-  // Начинаем позиционирование копии точно поверх картинки
-  flyingImg.style.left = `${imgRect.left}px`;
-  flyingImg.style.top = `${imgRect.top}px`;
+  // Устанавливаем точные размеры клона, как у оригинала
+  flyingImg.style.width = imgRect.width + 'px';
+  flyingImg.style.height = imgRect.height + 'px';
 
-  // Получаем координаты кнопки корзины
+  // Точно позиционируем клон поверх оригинала
+  flyingImg.style.left = imgRect.left + 'px';
+  flyingImg.style.top = imgRect.top + 'px';
+
   const cartBtnRect = cartButton.getBoundingClientRect();
 
-  // Запускаем анимацию на следующий кадр
   requestAnimationFrame(() => {
     flyingImg.style.transform = `translate(${cartBtnRect.left - imgRect.left}px, ${cartBtnRect.top - imgRect.top}px) scale(0.1)`;
     flyingImg.style.opacity = '0.5';
   });
 
-  // После окончания анимации удаляем летающее изображение
   flyingImg.addEventListener('transitionend', () => {
     flyingImg.remove();
   }, { once: true });
