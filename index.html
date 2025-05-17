@@ -99,23 +99,49 @@
     }
 
     #cart-button {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: #e63946;
-      border: none;
-      z-index: 1001;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      cursor: pointer;
-    }
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #e63946;
+  border: none;
+  z-index: 1001;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  color: white;
+  font-weight: bold;
+  font-size: 12px;
+  text-align: center;
+  padding-top: 4px;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
 
-    #cart-button img {
-      width: 28px;
-      height: 28px;
-    }
+#cart-button img {
+  width: 28px;
+  height: 28px;
+  pointer-events: none;
+}
+
+/* Блок с количеством и суммой */
+#cart-info {
+  font-size: 11px;
+  line-height: 1.1;
+  margin-top: 2px;
+  pointer-events: none;
+}
+
+/* Кнопка с товарами - меняем фон */
+#cart-button.has-items {
+  background: #f4c542; /* жёлтый цвет */
+  color: #000;
+}
+
 
     #cart {
       position: fixed;
@@ -384,6 +410,48 @@ function addToCart(productId) {
   }
   saveCart();
   renderCart();
+}
+function updateCart() {
+  if (cart.length === 0) {
+    cartItemsContainer.textContent = 'Корзина пуста';
+    totalDiv.textContent = 'Итого: 0 ₸';
+
+    // Обновляем кнопку корзины
+    cartButton.classList.remove('has-items');
+    document.getElementById('cart-info').textContent = '';
+    return;
+  }
+
+  cartItemsContainer.innerHTML = '';
+  cart.forEach((item) => {
+    const div = document.createElement('div');
+    div.className = 'cart-item';
+    div.innerHTML = `
+      <span>${item.name} (${item.price}₸)</span>
+      <div class="cart-item-qty">
+        <button>-</button><span>${item.qty}</span><button>+</button>
+      </div>
+    `;
+    div.querySelectorAll('button')[0].onclick = () => {
+      item.qty--;
+      if (item.qty <= 0) cart = cart.filter((i) => i.id !== item.id);
+      updateCart();
+    };
+    div.querySelectorAll('button')[1].onclick = () => {
+      item.qty++;
+      updateCart();
+    };
+    cartItemsContainer.appendChild(div);
+  });
+
+  const totalQty = cart.reduce((sum, i) => sum + i.qty, 0);
+  const totalPrice = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+
+  totalDiv.textContent = `Итого: ${totalPrice} ₸`;
+
+  // Обновляем кнопку корзины: класс и текст
+  cartButton.classList.add('has-items');
+  document.getElementById('cart-info').textContent = `${totalQty} шт. | ${totalPrice} ₸`;
 }
 
 function removeFromCart(productId) {
