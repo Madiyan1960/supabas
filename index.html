@@ -1,11 +1,11 @@
-<!DOCTYPE html>  
+<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Магазин на Supabase</title>
   <style>
-    body { font-family: Arial; background: #f0f0f0; margin: 10px; }
+    body { font-family: Arial, sans-serif; background: #f0f0f0; margin: 10px; }
     h1 { text-align: center; }
     #products {
       display: grid;
@@ -80,15 +80,55 @@
       width: 20px;
       height: 20px;
       padding: 0;
+      cursor: pointer;
     }
     #total { text-align: right; font-weight: bold; margin-top: 10px; }
     form input, form textarea {
       width: 100%;
       margin: 5px 0;
       padding: 5px;
+      box-sizing: border-box;
     }
     form button { width: 100%; }
     #message { text-align: center; color: green; margin-top: 10px; }
+
+    /* Мобильные стили */
+    @media (max-width: 600px) {
+      #products {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 8px;
+      }
+      .product-card {
+        font-size: 12px;
+        padding: 8px;
+      }
+      .product-card img {
+        height: 45%;
+      }
+      #cart {
+        width: 95vw;
+        max-height: 70vh;
+        top: auto;
+        bottom: 10px;
+        right: 50%;
+        transform: translateX(50%);
+        border-radius: 10px 10px 0 0;
+      }
+      #cart-toggle {
+        top: auto;
+        bottom: 90px;
+        right: 20px;
+      }
+      .cart-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+      }
+      .cart-item-qty {
+        gap: 8px;
+        margin-top: 3px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -166,8 +206,11 @@
     function addToCart(id) {
       const product = products.find(p => p.id === id);
       const item = cart.find(i => i.id === id);
-      if (item) item.qty++;
-      else cart.push({ ...product, qty: 1 });
+      if (item) {
+        item.qty++;
+      } else {
+        cart.push({ ...product, qty: 1 });
+      }
       updateCart();
     }
 
@@ -176,16 +219,21 @@
       const rect = img.getBoundingClientRect();
       const cartRect = cartIcon.getBoundingClientRect();
       Object.assign(clone.style, {
-        position: 'fixed', left: rect.left + 'px', top: rect.top + 'px',
-        width: rect.width + 'px', transition: 'all 0.7s ease-in-out',
-        zIndex: 1000
+        position: 'fixed',
+        left: rect.left + 'px',
+        top: rect.top + 'px',
+        width: rect.width + 'px',
+        transition: 'all 0.7s ease-in-out',
+        zIndex: 1000,
+        pointerEvents: 'none',
       });
       document.body.appendChild(clone);
       requestAnimationFrame(() => {
         Object.assign(clone.style, {
           left: cartRect.left + 'px',
           top: cartRect.top + 'px',
-          width: '20px', opacity: '0.5'
+          width: '20px',
+          opacity: '0.5',
         });
       });
       setTimeout(() => clone.remove(), 700);
@@ -204,44 +252,70 @@
         div.innerHTML = `
           <span>${item.name} (${item.price} ₸)</span>
           <div class="cart-item-qty">
-            <button>-</button><span>${item.qty}</span><button>+</button>
+            <button class="minus">-</button>
+            <span>${item.qty}</span>
+            <button class="plus">+</button>
           </div>
         `;
-        div.querySelectorAll('button')[0].onclick = () => {
+        div.querySelector('.minus').addEventListener('click', () => {
           item.qty--;
-          if (item.qty <= 0) cart = cart.filter(i => i.id !== item.id);
+          if (item.qty <= 0) {
+            cart = cart.filter(i => i.id !== item.id);
+          }
           updateCart();
-        };
-        div.querySelectorAll('button')[1].onclick = () => {
+        });
+        div.querySelector('.plus').addEventListener('click', () => {
           item.qty++;
           updateCart();
-        };
+        });
         cartItemsContainer.appendChild(div);
       });
-      const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+
+      const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
       totalDiv.textContent = `Итого: ${total} ₸`;
     }
 
-    orderForm.onsubmit = async e => {
+    orderForm.addEventListener('submit', async e => {
       e.preventDefault();
-      if (cart.length === 0) return alert('Корзина пуста!');
-      const order = {
-        name: document.getElementById('name').value,
-        phone: document.getElementById('phone').value,
-        address: document.getElementById('address').value,
-        products: cart.map(i => `${i.name} x${i.qty} (${i.price}₸)`).join(', '),
-        total: cart.reduce((sum, i) => sum + i.price * i.qty, 0)
-      };
-      const { error } = await supabase.from('orders').insert([order]);
+      if (cart.length === 0) {
+        alert('Корзина пуста');
+        return;
+      }
+      const name = orderForm.name.value.trim();
+      const phone = orderForm.phone.value.trim();
+      const address = orderForm.address.value.trim();
+
+      if (!name || !phone || !address) {
+        alert('Пожалуйста, заполните все поля');
+        return;
+      }
+
+      const productsList = cart.map(item => `${item.name} x${item.qty}`).join(', ');
+      const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+
+      // Запись заказа в Supabase
+      const { data, error } = await supabase.from('orders').insert([
+        {
+          name,
+          phone,
+          address,
+          products: productsList,
+          total,
+        }
+      ]);
+
       if (error) {
-        messageDiv.textContent = 'Ошибка отправки заказа';
+        messageDiv.style.color = 'red';
+        messageDiv.textContent = 'Ошибка при отправке заказа';
+        console.error(error);
       } else {
-        messageDiv.textContent = 'Заказ отправлен!';
+        messageDiv.style.color = 'green';
+        messageDiv.textContent = 'Заказ успешно отправлен!';
         cart = [];
         updateCart();
         orderForm.reset();
       }
-    };
+    });
 
     loadProducts();
   </script>
