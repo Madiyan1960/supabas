@@ -1,167 +1,248 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>Магазин</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Магазин на Supabase</title>
   <style>
-    body {
-      margin: 0;
-      font-family: sans-serif;
-      background: #f8f8f8;
-    }
-
-    .products {
+    body { font-family: Arial; background: #f0f0f0; margin: 10px; }
+    h1 { text-align: center; }
+    #products {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 1rem;
-      padding: 1rem;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 10px;
     }
-
-    .product {
-      position: relative;
-      aspect-ratio: 1 / 1;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    .product-card {
+      background: #fff;
       padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      text-align: center;
+      height: 230px;
       display: flex;
       flex-direction: column;
-      align-items: center;
       justify-content: space-between;
-      text-align: center;
-      transition: transform 0.2s;
-      overflow: hidden;
-    }
-
-    .product:hover {
-      transform: scale(1.02);
-    }
-
-    .product img {
-      max-width: 100%;
-      max-height: 60%;
-      object-fit: contain;
-      flex-grow: 1;
-    }
-
-    .product-name {
-      font-weight: bold;
-      margin: 8px 0 4px;
       font-size: 14px;
     }
-
-    .product-price {
-      color: #009688;
-      font-weight: bold;
-      margin-bottom: 8px;
+    .product-card img {
+      height: 100px;
+      object-fit: contain;
+      margin-bottom: 5px;
     }
-
-    .add-button {
-      background: #009688;
-      color: white;
+    .product-name {
+      font-weight: bold;
+      margin: 5px 0;
+      font-size: 0.95em;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .product-price {
+      color: green;
+      font-size: 0.85em;
+      margin-bottom: 5px;
+    }
+    button {
+      padding: 5px 10px;
       border: none;
-      padding: 6px 12px;
-      border-radius: 6px;
+      background: #2a9d8f;
+      color: white;
+      border-radius: 5px;
       cursor: pointer;
     }
-
-    .add-button:hover {
-      background: #00796B;
+    button:hover { background: #21867a; }
+    #cart-toggle {
+      position: fixed; top: 10px; right: 10px; z-index: 1001; background: none; border: none;
     }
-
-    /* Всплывающее уведомление */
-    .toast {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #009688;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 8px;
-      display: none;
-      z-index: 999;
+    #cart-toggle img { width: 40px; }
+    #cart {
+      position: fixed; top: 60px; right: 10px; background: white; padding: 10px;
+      width: 280px; max-height: 80vh; overflow-y: auto;
+      border: 1px solid #ccc; border-radius: 8px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      display: none; z-index: 1000;
     }
-
-    .cart-icon {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: #009688;
-      color: white;
-      padding: 10px;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
+    #cart.open { display: block; }
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .cart-item-qty {
       display: flex;
       align-items: center;
-      justify-content: center;
-      z-index: 100;
-      font-weight: bold;
+      gap: 5px;
     }
-
-    /* Анимация полёта */
-    .fly {
-      position: absolute;
-      z-index: 1000;
-      transition: transform 0.6s ease-in-out, opacity 0.6s;
-      pointer-events: none;
+    .cart-item-qty button {
+      width: 20px;
+      height: 20px;
+      padding: 0;
     }
+    #total { text-align: right; font-weight: bold; margin-top: 10px; }
+    form input, form textarea {
+      width: 100%;
+      margin: 5px 0;
+      padding: 5px;
+    }
+    form button { width: 100%; }
+    #message { text-align: center; color: green; margin-top: 10px; }
   </style>
 </head>
 <body>
+  <h1>Магазин на Supabase</h1>
+  <div id="products">Загрузка товаров...</div>
 
-<div class="cart-icon" id="cart-count">0</div>
+  <button id="cart-toggle" title="Открыть корзину">
+    <img id="cart-icon" src="https://cdn-icons-png.flaticon.com/512/1170/1170678.png" />
+  </button>
 
-<div class="products" id="product-list">
-  <div class="product">
-    <img src="https://i.imgur.com/1vLkvAq.png" alt="Яблоки">
-    <div class="product-name">Яблоки</div>
-    <div class="product-price">300.5 ₸</div>
-    <button class="add-button" onclick="addToCart(this)">Добавить</button>
+  <div id="cart">
+    <h2>Корзина</h2>
+    <div id="cartItems">Корзина пуста</div>
+    <div id="total">Итого: 0 ₸</div>
+    <form id="orderForm">
+      <input type="text" id="name" placeholder="Имя" required />
+      <input type="tel" id="phone" placeholder="Телефон" required />
+      <textarea id="address" placeholder="Адрес" rows="2" required></textarea>
+      <button type="submit">Отправить заказ</button>
+    </form>
+    <div id="message"></div>
   </div>
-  <!-- Добавляй другие товары по шаблону -->
-</div>
 
-<div class="toast" id="toast">Добавлено в корзину!</div>
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-<script>
-  let cartCount = 0;
+    const supabase = createClient(
+      'https://kpefeonxvgnfpgevkcwy.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtwZWZlb254dmduZnBnZXZrY3d5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyMzY4MDgsImV4cCI6MjA2MjgxMjgwOH0.aZJhwODNOS3FhyT8k-qAAfvo0NaYbv4QSm6SwuNaeys'
+    );
 
-  function addToCart(button) {
-    cartCount++;
-    document.getElementById('cart-count').textContent = cartCount;
+    const productsContainer = document.getElementById('products');
+    const cartToggle = document.getElementById('cart-toggle');
+    const cartPanel = document.getElementById('cart');
+    const cartItemsContainer = document.getElementById('cartItems');
+    const totalDiv = document.getElementById('total');
+    const orderForm = document.getElementById('orderForm');
+    const messageDiv = document.getElementById('message');
+    const cartIcon = document.getElementById('cart-icon');
 
-    // Всплывающее уведомление
-    const toast = document.getElementById('toast');
-    toast.style.display = 'block';
-    setTimeout(() => toast.style.display = 'none', 1500);
+    let products = [];
+    let cart = [];
 
-    // Анимация "полет"
-    const product = button.closest('.product');
-    const img = product.querySelector('img');
-    const flyImg = img.cloneNode(true);
-    const rect = img.getBoundingClientRect();
+    cartToggle.addEventListener('click', () => cartPanel.classList.toggle('open'));
 
-    flyImg.classList.add('fly');
-    flyImg.style.left = rect.left + 'px';
-    flyImg.style.top = rect.top + 'px';
-    flyImg.style.width = rect.width + 'px';
-    flyImg.style.height = rect.height + 'px';
-    document.body.appendChild(flyImg);
+    async function loadProducts() {
+      const { data, error } = await supabase.from('products').select('*');
+      if (error) {
+        productsContainer.textContent = 'Ошибка загрузки!';
+        return;
+      }
+      products = data;
+      renderProducts();
+    }
 
-    const cartIcon = document.getElementById('cart-count').getBoundingClientRect();
-    requestAnimationFrame(() => {
-      flyImg.style.transform = `translate(${cartIcon.left - rect.left}px, ${cartIcon.top - rect.top}px) scale(0.2)`;
-      flyImg.style.opacity = '0';
-    });
+    function renderProducts() {
+      productsContainer.innerHTML = '';
+      products.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.innerHTML = `
+          <img src="${p.image_url || ''}" alt="${p.name}" />
+          <div class="product-name">${p.name}</div>
+          <div class="product-price">${p.price} ₸</div>
+          <button>Добавить</button>
+        `;
+        card.querySelector('button').addEventListener('click', () => {
+          addToCart(p.id);
+          flyToCart(card.querySelector('img'));
+        });
+        productsContainer.appendChild(card);
+      });
+    }
 
-    flyImg.addEventListener('transitionend', () => {
-      flyImg.remove();
-    });
-  }
-</script>
+    function addToCart(id) {
+      const product = products.find(p => p.id === id);
+      const item = cart.find(i => i.id === id);
+      if (item) item.qty++;
+      else cart.push({ ...product, qty: 1 });
+      updateCart();
+    }
 
+    function flyToCart(img) {
+      const clone = img.cloneNode(true);
+      const rect = img.getBoundingClientRect();
+      const cartRect = cartIcon.getBoundingClientRect();
+      Object.assign(clone.style, {
+        position: 'fixed', left: rect.left + 'px', top: rect.top + 'px',
+        width: rect.width + 'px', transition: 'all 0.7s ease-in-out',
+        zIndex: 1000
+      });
+      document.body.appendChild(clone);
+      requestAnimationFrame(() => {
+        Object.assign(clone.style, {
+          left: cartRect.left + 'px',
+          top: cartRect.top + 'px',
+          width: '20px', opacity: '0.5'
+        });
+      });
+      setTimeout(() => clone.remove(), 700);
+    }
+
+    function updateCart() {
+      if (cart.length === 0) {
+        cartItemsContainer.textContent = 'Корзина пуста';
+        totalDiv.textContent = 'Итого: 0 ₸';
+        return;
+      }
+      cartItemsContainer.innerHTML = '';
+      cart.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'cart-item';
+        div.innerHTML = `
+          <span>${item.name} (${item.price} ₸)</span>
+          <div class="cart-item-qty">
+            <button>-</button><span>${item.qty}</span><button>+</button>
+          </div>
+        `;
+        div.querySelectorAll('button')[0].onclick = () => {
+          item.qty--;
+          if (item.qty <= 0) cart = cart.filter(i => i.id !== item.id);
+          updateCart();
+        };
+        div.querySelectorAll('button')[1].onclick = () => {
+          item.qty++;
+          updateCart();
+        };
+        cartItemsContainer.appendChild(div);
+      });
+      const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+      totalDiv.textContent = `Итого: ${total} ₸`;
+    }
+
+    orderForm.onsubmit = async e => {
+      e.preventDefault();
+      if (cart.length === 0) return alert('Корзина пуста!');
+      const order = {
+        name: document.getElementById('name').value,
+        phone: document.getElementById('phone').value,
+        address: document.getElementById('address').value,
+        products: cart.map(i => `${i.name} x${i.qty} (${i.price}₸)`).join(', '),
+        total: cart.reduce((sum, i) => sum + i.price * i.qty, 0)
+      };
+      const { error } = await supabase.from('orders').insert([order]);
+      if (error) {
+        messageDiv.textContent = 'Ошибка отправки заказа';
+      } else {
+        messageDiv.textContent = 'Заказ отправлен!';
+        cart = [];
+        updateCart();
+        orderForm.reset();
+      }
+    };
+
+    loadProducts();
+  </script>
 </body>
 </html>
