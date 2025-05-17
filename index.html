@@ -15,12 +15,12 @@
     margin: 20px 0;
   }
   #products {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 15px;
-    padding: 10px;
-  }
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  padding: 10px;
+}
+
   .product {
     background: white;
     width: 160px;
@@ -236,8 +236,10 @@ function renderProducts() {
     `;
     const btn = div.querySelector('button');
     btn.onclick = () => {
-      addToCart(product);
-    };
+  animateFlyToCart(div.querySelector('img'));
+  addToCart(product);
+};
+
     productsContainer.appendChild(div);
   });
 }
@@ -354,6 +356,32 @@ orderForm.onsubmit = (e) => {
 
 loadProducts();
 updateCart();
+  function animateFlyToCart(imgEl) {
+  const cartBtn = document.getElementById('openCart');
+  const imgRect = imgEl.getBoundingClientRect();
+  const cartRect = cartBtn.getBoundingClientRect();
+
+  const clone = imgEl.cloneNode();
+  clone.style.position = 'fixed';
+  clone.style.left = imgRect.left + 'px';
+  clone.style.top = imgRect.top + 'px';
+  clone.style.width = imgRect.width + 'px';
+  clone.style.transition = 'all 0.8s ease-in-out';
+  clone.style.zIndex = 9999;
+  document.body.appendChild(clone);
+
+  requestAnimationFrame(() => {
+    clone.style.left = cartRect.left + 'px';
+    clone.style.top = cartRect.top + 'px';
+    clone.style.width = '20px';
+    clone.style.opacity = '0.5';
+  });
+
+  setTimeout(() => {
+    clone.remove();
+  }, 800);
+}
+
 </script>
 </body>
 </html>
