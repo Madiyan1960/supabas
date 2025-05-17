@@ -17,29 +17,10 @@
       margin-bottom: 10px;
     }
 
-    #filters {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 10px;
-      max-width: 400px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    #filters input[type="text"],
-    #filters select {
-      flex: 1;
-      padding: 5px;
-      font-size: 14px;
-    }
-
     #products {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
       gap: 10px;
-      max-width: 900px;
-      margin: 0 auto;
     }
 
     .product-card {
@@ -91,7 +72,6 @@
       font-size: 18px;
       cursor: pointer;
       line-height: 1;
-      user-select: none;
     }
 
     .add-button:hover {
@@ -99,49 +79,40 @@
     }
 
     #cart-button {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: #e63946;
-  border: none;
-  z-index: 1001;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-  color: white;
-  font-weight: bold;
-  font-size: 12px;
-  text-align: center;
-  padding-top: 4px;
-  overflow: visible;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #e63946;
+      border: none;
+      z-index: 1001;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      position: relative;
+    }
 
-#cart-button img {
-  width: 28px;
-  height: 28px;
-  pointer-events: none;
-}
+    #cart-button img {
+      width: 28px;
+      height: 28px;
+    }
 
-/* Блок с количеством и суммой */
-#cart-info {
-  font-size: 11px;
-  line-height: 1.1;
-  margin-top: 2px;
-  pointer-events: none;
-}
-
-/* Кнопка с товарами - меняем фон */
-#cart-button.has-items {
-  background: #f4c542; /* жёлтый цвет */
-  color: #000;
-}
-
+    #cart-info {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: #333;
+      color: #fff;
+      font-weight: bold;
+      font-size: 12px;
+      padding: 2px 5px;
+      border-radius: 12px;
+      min-width: 30px;
+      text-align: center;
+      display: none;
+      user-select: none;
+    }
 
     #cart {
       position: fixed;
@@ -182,7 +153,6 @@
       background: #ccc;
       border-radius: 4px;
       cursor: pointer;
-      user-select: none;
     }
 
     #total {
@@ -196,8 +166,6 @@
       width: 100%;
       padding: 5px;
       margin: 5px 0;
-      font-size: 14px;
-      box-sizing: border-box;
     }
 
     form button {
@@ -207,16 +175,12 @@
       color: white;
       border: none;
       border-radius: 5px;
-      font-size: 16px;
-      cursor: pointer;
-      user-select: none;
     }
 
     #message {
       text-align: center;
       color: green;
       margin-top: 10px;
-      min-height: 20px;
     }
 
     /* Анимация полёта */
@@ -228,35 +192,20 @@
       pointer-events: none;
       transition: transform 0.8s ease-in-out, opacity 0.8s ease-in-out;
       z-index: 2000;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-      background: white;
     }
   </style>
 </head>
 <body>
   <h1>Магазин</h1>
-
-  <div id="filters">
-    <input type="text" id="search" placeholder="Поиск товаров..." autocomplete="off" />
-    <select id="sort">
-      <option value="">Сортировка</option>
-      <option value="name">По названию</option>
-      <option value="price">По цене (возр.)</option>
-      <option value="price_desc">По цене (убыв.)</option>
-    </select>
-  </div>
-
   <div id="products">Загрузка товаров...</div>
 
   <button id="cart-button" title="Корзина">
-  <img
-    src="https://cdn-icons-png.flaticon.com/512/1170/1170678.png"
-    alt="Корзина"
-  />
-  <div id="cart-info"></div>
-</button>
-
+    <img
+      src="https://cdn-icons-png.flaticon.com/512/1170/1170678.png"
+      alt="Корзина"
+    />
+    <span id="cart-info"></span>
+  </button>
 
   <div id="cart">
     <h2>Корзина</h2>
@@ -282,27 +231,16 @@
     const productsContainer = document.getElementById('products');
     const cartPanel = document.getElementById('cart');
     const cartButton = document.getElementById('cart-button');
+    const cartInfo = document.getElementById('cart-info');
     const cartItemsContainer = document.getElementById('cartItems');
     const totalDiv = document.getElementById('total');
     const orderForm = document.getElementById('orderForm');
     const messageDiv = document.getElementById('message');
 
-    const searchInput = document.getElementById('search');
-    const sortSelect = document.getElementById('sort');
-
     let products = [];
-    let filteredProducts = [];
     let cart = [];
 
     cartButton.addEventListener('click', () => cartPanel.classList.toggle('open'));
-
-    searchInput.addEventListener('input', () => {
-      filterAndRender();
-    });
-
-    sortSelect.addEventListener('change', () => {
-      sortAndRender();
-    });
 
     async function loadProducts() {
       const { data, error } = await supabase.from('products').select('*');
@@ -311,114 +249,72 @@
         return;
       }
       products = data;
-      filteredProducts = [...products];
-      renderProducts(filteredProducts);
+      renderProducts();
     }
 
-    function renderProducts(list) {
+    function renderProducts() {
       productsContainer.innerHTML = '';
-      if (list.length === 0) {
-        productsContainer.textContent = 'Ничего не найдено';
-        return;
-      }
-
-      list.forEach((p) => {
+      products.forEach((p) => {
         const card = document.createElement('div');
         card.className = 'product-card';
         card.innerHTML = `
           <img src="${p.image_url || ''}" alt="${p.name}" />
           <div class="product-name">${p.name}</div>
           <div class="product-price">${p.price} ₸</div>
-          <button class="add-button" aria-label="Добавить ${p.name} в корзину">+</button>
+          <button class="add-button">+</button>
         `;
         const addButton = card.querySelector('.add-button');
-        addButton.onclick = () => {
-  const img = card.querySelector('img');
-  flyToCart(img);
-  addToCart(p.id);
-};
+        addButton.onclick = (e) => {
+          flyToCart(card.querySelector('img'));
+          addToCart(p.id);
+        };
         productsContainer.appendChild(card);
       });
     }
 
-    function filterAndRender() {
-      const query = searchInput.value.trim().toLowerCase();
-      filteredProducts = products.filter(p => p.name.toLowerCase().includes(query));
-      sortAndRender();
-    }
+    function flyToCart(img) {
+      const flyingImg = img.cloneNode(true);
+      flyingImg.classList.add('flying-img');
+      document.body.appendChild(flyingImg);
 
-    function sortAndRender() {
-      const sortValue = sortSelect.value;
+      const imgRect = img.getBoundingClientRect();
+      const cartBtnRect = cartButton.getBoundingClientRect();
 
-      if (sortValue === 'name') {
-        filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
-      } else if (sortValue === 'price') {
-        filteredProducts.sort((a, b) => a.price - b.price);
-      } else if (sortValue === 'price_desc') {
-        filteredProducts.sort((a, b) => b.price - a.price);
-      }
-      renderProducts(filteredProducts);
-    }
+      flyingImg.style.left = imgRect.left + 'px';
+      flyingImg.style.top = imgRect.top + 'px';
 
-  function flyToCart(img) {
-  const flyingImg = img.cloneNode(true);
-  flyingImg.classList.add('flying-img');
-  document.body.appendChild(flyingImg);
+      requestAnimationFrame(() => {
+        flyingImg.style.transform = `translate(${cartBtnRect.left - imgRect.left}px, ${
+          cartBtnRect.top - imgRect.top
+        }px) scale(0.1)`;
+        flyingImg.style.opacity = '0.5';
+      });
 
-  const imgRect = img.getBoundingClientRect();
-
-  // Устанавливаем точные размеры клона, как у оригинала
-  flyingImg.style.width = imgRect.width + 'px';
-  flyingImg.style.height = imgRect.height + 'px';
-
-  // Точно позиционируем клон поверх оригинала
-  flyingImg.style.left = imgRect.left + 'px';
-  flyingImg.style.top = imgRect.top + 'px';
-
-  const cartBtnRect = cartButton.getBoundingClientRect();
-
-  requestAnimationFrame(() => {
-    flyingImg.style.transform = `translate(${cartBtnRect.left - imgRect.left}px, ${cartBtnRect.top - imgRect.top}px) scale(0.1)`;
-    flyingImg.style.opacity = '0.5';
-  });
-
-  flyingImg.addEventListener('transitionend', () => {
-    flyingImg.remove();
-  }, { once: true });
+      flyingImg.addEventListener(
+       
+'transitionend',
+() => document.body.removeChild(flyingImg),
+{ once: true }
+);
 }
-
-
-
-
-function saveCart() {
-  localStorage.setItem('cart', JSON.stringify(cart));
-}
-
-function loadCart() {
-  const saved = localStorage.getItem('cart');
-  if (saved) {
-    cart = JSON.parse(saved);
-  }
-}
-
-function addToCart(productId) {
-  const item = cart.find(i => i.id === productId);
-  if (item) {
-    item.qty++;
+   function addToCart(productId) {
+  const existing = cart.find((item) => item.id === productId);
+  if (existing) {
+    existing.qty += 1;
   } else {
-    cart.push({ id: productId, qty: 1 });
+    const product = products.find((p) => p.id === productId);
+    cart.push({ id: product.id, name: product.name, price: product.price, qty: 1 });
   }
-  saveCart();
-  renderCart();
+  updateCart();
 }
+
 function updateCart() {
   if (cart.length === 0) {
     cartItemsContainer.textContent = 'Корзина пуста';
     totalDiv.textContent = 'Итого: 0 ₸';
-
-    // Обновляем кнопку корзины
-    cartButton.classList.remove('has-items');
-    document.getElementById('cart-info').textContent = '';
+    cartButton.style.backgroundColor = '#e63946';
+    cartInfo.style.display = 'none';
+    cartInfo.textContent = '';
     return;
   }
 
@@ -427,151 +323,61 @@ function updateCart() {
     const div = document.createElement('div');
     div.className = 'cart-item';
     div.innerHTML = `
-      <span>${item.name} (${item.price}₸)</span>
+      <span>${item.name}</span>
       <div class="cart-item-qty">
-        <button>-</button><span>${item.qty}</span><button>+</button>
+        <button onclick="changeQty(${item.id}, -1)">−</button>
+        ${item.qty}
+        <button onclick="changeQty(${item.id}, 1)">+</button>
       </div>
     `;
-    div.querySelectorAll('button')[0].onclick = () => {
-      item.qty--;
-      if (item.qty <= 0) cart = cart.filter((i) => i.id !== item.id);
-      updateCart();
-    };
-    div.querySelectorAll('button')[1].onclick = () => {
-      item.qty++;
-      updateCart();
-    };
     cartItemsContainer.appendChild(div);
   });
 
   const totalQty = cart.reduce((sum, i) => sum + i.qty, 0);
   const totalPrice = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
-
   totalDiv.textContent = `Итого: ${totalPrice} ₸`;
 
-  // Обновляем кнопку корзины: класс и текст
-  cartButton.classList.add('has-items');
-  document.getElementById('cart-info').textContent = `${totalQty} шт. | ${totalPrice} ₸`;
+  cartButton.style.backgroundColor = '#ffeb3b';
+  cartInfo.style.display = 'inline-block';
+  cartInfo.textContent = `${totalQty} | ${totalPrice} ₸`;
 }
 
-function removeFromCart(productId) {
-  cart = cart.filter(i => i.id !== productId);
-  saveCart();
-  renderCart();
-}
-
-function changeQty(productId, delta) {
-  const item = cart.find(i => i.id === productId);
+window.changeQty = function (productId, delta) {
+  const item = cart.find((i) => i.id === productId);
   if (!item) return;
   item.qty += delta;
   if (item.qty <= 0) {
-    removeFromCart(productId);
-  } else {
-    saveCart();
-    renderCart();
+    cart = cart.filter((i) => i.id !== productId);
   }
-}
-
-function renderCart() {
-  if (cart.length === 0) {
-    cartItemsContainer.textContent = 'Корзина пуста';
-    totalDiv.textContent = 'Итого: 0 ₸';
-    return;
-  }
-
-  cartItemsContainer.innerHTML = '';
-
-  let total = 0;
-
-  cart.forEach(({ id, qty }) => {
-    const product = products.find(p => p.id === id);
-    if (!product) return;
-
-    total += product.price * qty;
-
-    const itemDiv = document.createElement('div');
-    itemDiv.className = 'cart-item';
-    itemDiv.innerHTML = `
-      <div>${product.name}</div>
-      <div class="cart-item-qty">
-        <button aria-label="Уменьшить количество">−</button>
-        <span>${qty}</span>
-        <button aria-label="Увеличить количество">+</button>
-      </div>
-    `;
-    const btnMinus = itemDiv.querySelector('button:first-child');
-    const btnPlus = itemDiv.querySelector('button:last-child');
-
-    btnMinus.onclick = () => changeQty(id, -1);
-    btnPlus.onclick = () => changeQty(id, +1);
-
-    cartItemsContainer.appendChild(itemDiv);
-  });
-
-  totalDiv.textContent = `Итого: ${total} ₸`;
-}
+  updateCart();
+};
 
 orderForm.addEventListener('submit', async (e) => {
   e.preventDefault();
-  if (cart.length === 0) {
-    alert('Корзина пуста');
-    return;
-  }
-
   const name = document.getElementById('name').value.trim();
   const phone = document.getElementById('phone').value.trim();
   const address = document.getElementById('address').value.trim();
+  if (!name || !phone || !address || cart.length === 0) return;
 
-  if (!name || !phone || !address) {
-    alert('Пожалуйста, заполните все поля');
-    return;
-  }
-
-  // Формируем список продуктов с количеством
-  const productsList = cart.map(({ id, qty }) => {
-  const product = products.find(p => p.id === id);
-  if (!product) return '';
-  const totalPrice = product.price * qty;
-  return `${product.name} ${product.price} x${qty}=${totalPrice}₸`;
-}).filter(Boolean).join(', ');
-
-
-  const total = cart.reduce((sum, { id, qty }) => {
-    const product = products.find(p => p.id === id);
-    return product ? sum + product.price * qty : sum;
-  }, 0);
-
-  // Отправляем заказ в Supabase
-  const { error } = await supabase.from('orders').insert([{
+  const order = {
     name,
     phone,
     address,
-    products: productsList,
-    total
-  }]);
+    products: cart.map((i) => `${i.name} x${i.qty}`).join(', '),
+    total: cart.reduce((sum, i) => sum + i.price * i.qty, 0),
+  };
 
+  const { error } = await supabase.from('orders').insert([order]);
   if (error) {
-    messageDiv.textContent = 'Ошибка при отправке заказа. Попробуйте позже.';
-    messageDiv.style.color = 'red';
-    return;
+    messageDiv.textContent = 'Ошибка заказа!';
+  } else {
+    messageDiv.textContent = 'Заказ отправлен!';
+    cart = [];
+    updateCart();
+    orderForm.reset();
+    setTimeout(() => (messageDiv.textContent = ''), 3000);
   }
-
-  messageDiv.textContent = 'Спасибо за заказ!';
-  messageDiv.style.color = 'green';
-
-  cart = [];
-  saveCart();
-  renderCart();
-  orderForm.reset();
-
-  // Скрыть сообщение через 3 секунды
-  setTimeout(() => messageDiv.textContent = '', 3000);
 });
 
-// Загрузка корзины и товаров при старте
-loadCart();
-loadProducts().then(() => {
-  renderCart();
-  filterAndRender();
-});
-</script> </body> </html> ```
+loadProducts();
+ </script> </body> </html> ```
