@@ -332,31 +332,35 @@
     }
 
     function flyToCart(img) {
-      const flyingImg = img.cloneNode(true);
-      flyingImg.classList.add('flying-img');
-      document.body.appendChild(flyingImg);
+  const flyingImg = img.cloneNode(true); // клонируем изображение
+  flyingImg.classList.add('flying-img');
+  document.body.appendChild(flyingImg);
 
-      const imgRect = img.getBoundingClientRect();
-      const cartBtnRect = cartButton.getBoundingClientRect();
+  const imgRect = img.getBoundingClientRect();          // координаты исходного изображения
+  const cartBtnRect = cartButton.getBoundingClientRect(); // координаты кнопки корзины
 
-      // Начальная позиция с учётом прокрутки
-      flyingImg.style.left = imgRect.left + window.pageXOffset + 'px';
-  flyingImg.style.top = imgRect.top + window.pageYOffset + 'px';
+  // Начальная позиция летающего изображения - совпадает с изображением товара
+  flyingImg.style.left = imgRect.left + 'px';
+  flyingImg.style.top = imgRect.top + 'px';
 
-  // Принудительно вызовем reflow, чтобы применились стили (нужно для transition)
-  flyingImg.offsetWidth;
-
-  // Конечная позиция (центр кнопки корзины)
-  const destX = cartBtnRect.left + cartBtnRect.width / 2 - 25 + window.pageXOffset;
-  const destY = cartBtnRect.top + cartBtnRect.height / 2 - 25 + window.pageYOffset;
-
-  flyingImg.style.transform = `translate(${destX - (imgRect.left + window.pageXOffset)}px, ${destY - (imgRect.top + window.pageYOffset)}px) scale(0.1)`;
-  flyingImg.style.opacity = '0.5';
-
-  flyingImg.addEventListener('transitionend', () => {
-    flyingImg.remove();
+  // Запускаем анимацию через requestAnimationFrame
+  requestAnimationFrame(() => {
+    flyingImg.style.transform = `translate(${cartBtnRect.left - imgRect.left}px, ${
+      cartBtnRect.top - imgRect.top
+    }px) scale(0.1)`;
+    flyingImg.style.opacity = '0.5';
   });
+
+  // Когда анимация закончится — удаляем летающее изображение
+  flyingImg.addEventListener(
+    'transitionend',
+    () => {
+      flyingImg.remove();
+    },
+    { once: true }
+  );
 }
+
 
 function saveCart() {
   localStorage.setItem('cart', JSON.stringify(cart));
