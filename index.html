@@ -458,7 +458,7 @@ orderForm.addEventListener('submit', async (e) => {
   const product = products.find(p => p.id === id);
   if (!product) return '';
   const totalPrice = product.price * qty;
-  return `${product.name} x${qty} (${totalPrice}₸)`;
+  return `${product.name} ${product.price} x${qty}=${totalPrice}₸`;
 }).filter(Boolean).join(', ');
 
 
