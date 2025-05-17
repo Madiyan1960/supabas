@@ -305,9 +305,10 @@
         `;
         const addButton = card.querySelector('.add-button');
         addButton.onclick = () => {
-          flyToCart(card.querySelector('img'));
-          addToCart(p.id);
-        };
+  const img = card.querySelector('img');
+  flyToCart(img);
+  addToCart(p.id);
+};
         productsContainer.appendChild(card);
       });
     }
