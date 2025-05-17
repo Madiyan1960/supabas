@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
@@ -11,76 +10,138 @@
   <style>
     body { font-family: Arial, sans-serif; margin: 10px; background: #f9f9f9; }
     h1 { text-align: center; }
-    #products { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
-    .product-card { border: 1px solid #ddd; border-radius: 5px; padding: 8px; width: 150px; background: #fff; box-shadow: 0 0 5px rgba(0,0,0,0.1); text-align: center; }
-    .product-card img { max-width: 100%; height: 100px; object-fit: contain; }
-    .product-name { font-weight: bold; margin: 5px 0 3px 0; }
-    .product-price { color: #333; margin-bottom: 5px; }
-    button { background: #2a9d8f; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; }
-    button:hover { background: #21867a; }
 
-#cart-toggle {
-  position: fixed;
-  right: 10px;
-  top: 10px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  z-index: 1001;
-}
-#cart-toggle img {
-  width: 40px;
-}
-  #cart {
- width: 90vw; /* 80% от ширины экрана */
-  max-width: 320px;
-  position: fixed;
-  right: 10px;
-  top: 60px;
+    #products {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 10px;
+      justify-content: center;
+    }
 
+    .product-card {
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 8px;
+      background: #fff;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .product-card img {
+      max-width: 100%;
+      height: 100px;
+      object-fit: contain;
+    }
+    .product-name {
+      font-weight: bold;
+      margin: 5px 0 3px 0;
+    }
+    .product-price {
+      color: #333;
+      margin-bottom: 5px;
+    }
+    button {
+      background: #2a9d8f;
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #21867a;
+    }
 
-  max-height: 85vh;
-  overflow-y: auto;
-  background: white;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 10px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.2);
-  font-size: 14px;
-  transition: transform 0.3s ease;
-  transform: translateX(100%);
-  z-index: 1000;
-}
+    #cart-toggle {
+      position: fixed;
+      right: 10px;
+      top: 10px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      z-index: 1001;
+    }
+    #cart-toggle img {
+      width: 40px;
+    }
 
+    #cart {
+      width: 90vw;
+      max-width: 320px;
+      position: fixed;
+      right: 10px;
+      top: 60px;
+      max-height: 85vh;
+      overflow-y: auto;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      font-size: 14px;
+      transition: transform 0.3s ease;
+      transform: translateX(100%);
+      z-index: 1000;
+    }
 
-#cart.open {
-  transform: translateX(0);
-}
+    #cart.open {
+      transform: translateX(0);
+    }
 
-#cart h2 { margin-top: 0; text-align: center; }
-.cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-.cart-item-name { flex: 1 1 auto; }
-.cart-item-qty { display: flex; align-items: center; gap: 5px; }
-.cart-item-qty button { width: 26px; height: 26px; font-weight: bold; padding: 0; line-height: 1; border-radius: 4px; }
-#total { font-weight: bold; text-align: right; margin-top: 10px; }
-#orderForm { margin-top: 10px; }
-#orderForm input, #orderForm textarea { width: 100%; box-sizing: border-box; margin-bottom: 8px; padding: 6px; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; }
-#orderForm button { width: 100%; font-size: 16px; }
-#message { text-align: center; color: green; margin-top: 8px; }
-
- #product-list {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  padding: 10px;
-}
-
-
+    #cart h2 { margin-top: 0; text-align: center; }
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 5px;
+    }
+    .cart-item-name { flex: 1 1 auto; }
+    .cart-item-qty {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .cart-item-qty button {
+      width: 26px;
+      height: 26px;
+      font-weight: bold;
+      padding: 0;
+      line-height: 1;
+      border-radius: 4px;
+    }
+    #total {
+      font-weight: bold;
+      text-align: right;
+      margin-top: 10px;
+    }
+    #orderForm {
+      margin-top: 10px;
+    }
+    #orderForm input,
+    #orderForm textarea {
+      width: 100%;
+      box-sizing: border-box;
+      margin-bottom: 8px;
+      padding: 6px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    #orderForm button {
+      width: 100%;
+      font-size: 16px;
+    }
+    #message {
+      text-align: center;
+      color: green;
+      margin-top: 8px;
+    }
   </style>
 </head>
 <body>
 
-<h1>Магазин на Supabase (v6)</h1>
+<h1>Магазин на Supabase (v7)</h1>
 
 <div id="products">Загрузка товаров...</div>
 
@@ -102,193 +163,193 @@
 </div>
 
 <script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-const SUPABASE_URL = 'https://kpefeonxvgnfpgevkcwy.supabase.co'
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtwZWZlb254dmduZnBnZXZrY3d5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyMzY4MDgsImV4cCI6MjA2MjgxMjgwOH0.aZJhwODNOS3FhyT8k-qAAfvo0NaYbv4QSm6SwuNaeys'
+  const SUPABASE_URL = 'https://kpefeonxvgnfpgevkcwy.supabase.co'
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtwZWZlb254dmduZnBnZXZrY3d5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyMzY4MDgsImV4cCI6MjA2MjgxMjgwOH0.aZJhwODNOS3FhyT8k-qAAfvo0NaYbv4QSm6SwuNaeys'
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-const productsContainer = document.getElementById('products');
-const cartItemsContainer = document.getElementById('cartItems');
-const totalDiv = document.getElementById('total');
-const orderForm = document.getElementById('orderForm');
-const messageDiv = document.getElementById('message');
-const cartPanel = document.getElementById('cart');
-const toggleButton = document.getElementById('cart-toggle');
+  const productsContainer = document.getElementById('products')
+  const cartItemsContainer = document.getElementById('cartItems')
+  const totalDiv = document.getElementById('total')
+  const orderForm = document.getElementById('orderForm')
+  const messageDiv = document.getElementById('message')
+  const cartPanel = document.getElementById('cart')
+  const toggleButton = document.getElementById('cart-toggle')
 
-toggleButton.addEventListener('click', () => {
-  cartPanel.classList.toggle('open');
-});
+  toggleButton.addEventListener('click', () => {
+    cartPanel.classList.toggle('open')
+  })
 
-let products = [];
-let cart = [];
+  let products = []
+  let cart = []
 
-async function loadProducts() {
-  productsContainer.textContent = 'Загрузка товаров...';
-  const { data, error } = await supabase.from('products').select('id,name,price,image_url');
-  if (error) {
-    productsContainer.textContent = 'Ошибка загрузки товаров';
-    console.error(error);
-    return;
+  async function loadProducts() {
+    productsContainer.textContent = 'Загрузка товаров...'
+    const { data, error } = await supabase.from('products').select('id,name,price,image_url')
+    if (error) {
+      productsContainer.textContent = 'Ошибка загрузки товаров'
+      console.error(error)
+      return
+    }
+    products = data
+    renderProducts()
   }
-  products = data;
-  renderProducts();
-}
 
-function renderProducts() {
-  if (!products.length) {
-    productsContainer.textContent = 'Нет товаров';
-    return;
+  function renderProducts() {
+    if (!products.length) {
+      productsContainer.textContent = 'Нет товаров'
+      return
+    }
+    productsContainer.innerHTML = ''
+    products.forEach(p => {
+      const card = document.createElement('div')
+      card.className = 'product-card'
+      card.innerHTML = `
+        <img src="${p.image_url || ''}" alt="${p.name}" />
+        <div class="product-name">${p.name}</div>
+        <div class="product-price">${p.price} ₸</div>
+        <button data-id="${p.id}">Добавить в корзину</button>
+      `
+      card.querySelector('button').addEventListener('click', () => {
+        addToCart(p.id)
+        const img = card.querySelector('img')
+        if (img) flyToCart(img)
+      })
+      productsContainer.appendChild(card)
+    })
   }
-  productsContainer.innerHTML = '';
-  products.forEach(p => {
-    const card = document.createElement('div');
-    card.className = 'product-card';
-    card.innerHTML = `
-      <img src="${p.image_url || ''}" alt="${p.name}" />
-      <div class="product-name">${p.name}</div>
-      <div class="product-price">${p.price} ₸</div>
-      <button data-id="${p.id}">Добавить в корзину</button>
-    `;
-    card.querySelector('button').addEventListener('click', () => {
-      addToCart(p.id);
-      const img = card.querySelector('img');
-      if (img) flyToCart(img);
-    });
-    productsContainer.appendChild(card);
-  });
-}
 
-function addToCart(productId) {
-  const product = products.find(p => p.id === productId);
-  if (!product) return;
-  const item = cart.find(c => c.id === productId);
-  if (item) {
-    item.qty++;
-  } else {
-    cart.push({...product, qty: 1});
+  function addToCart(productId) {
+    const product = products.find(p => p.id === productId)
+    if (!product) return
+    const item = cart.find(c => c.id === productId)
+    if (item) {
+      item.qty++
+    } else {
+      cart.push({ ...product, qty: 1 })
+    }
+    updateCartUI()
   }
-  updateCartUI();
-}
 
-function flyToCart(imgElement) {
-  const cartIcon = document.querySelector('#cart-icon');
-  const imgClone = imgElement.cloneNode(true);
-  const imgRect = imgElement.getBoundingClientRect();
-  const cartRect = cartIcon.getBoundingClientRect();
+  function flyToCart(imgElement) {
+    const cartIcon = document.querySelector('#cart-icon')
+    const imgClone = imgElement.cloneNode(true)
+    const imgRect = imgElement.getBoundingClientRect()
+    const cartRect = cartIcon.getBoundingClientRect()
 
-  imgClone.style.position = 'fixed';
-  imgClone.style.zIndex = '9999';
-  imgClone.style.left = imgRect.left + 'px';
-  imgClone.style.top = imgRect.top + 'px';
-  imgClone.style.width = imgRect.width + 'px';
-  imgClone.style.transition = 'all 0.8s ease-in-out';
-  document.body.appendChild(imgClone);
+    imgClone.style.position = 'fixed'
+    imgClone.style.zIndex = '9999'
+    imgClone.style.left = imgRect.left + 'px'
+    imgClone.style.top = imgRect.top + 'px'
+    imgClone.style.width = imgRect.width + 'px'
+    imgClone.style.transition = 'all 0.8s ease-in-out'
+    document.body.appendChild(imgClone)
 
-  requestAnimationFrame(() => {
-    imgClone.style.left = cartRect.left + 'px';
-    imgClone.style.top = cartRect.top + 'px';
-    imgClone.style.width = '20px';
-    imgClone.style.opacity = '0.5';
-  });
+    requestAnimationFrame(() => {
+      imgClone.style.left = cartRect.left + 'px'
+      imgClone.style.top = cartRect.top + 'px'
+      imgClone.style.width = '20px'
+      imgClone.style.opacity = '0.5'
+    })
 
-  setTimeout(() => {
-    imgClone.remove();
-  }, 800);
-}
-
-function updateCartUI() {
-  if (cart.length === 0) {
-    cartItemsContainer.textContent = 'Корзина пуста';
-    totalDiv.textContent = 'Итого: 0';
-    return;
+    setTimeout(() => {
+      imgClone.remove()
+    }, 800)
   }
-  cartItemsContainer.innerHTML = '';
-  cart.forEach(item => {
-    const div = document.createElement('div');
-    div.className = 'cart-item';
-    div.innerHTML = `
-      <div class="cart-item-name">${item.name} (${item.price} ₸)</div>
-      <div class="cart-item-qty">
-        <button class="dec" data-id="${item.id}">-</button>
-        <div>${item.qty}</div>
-        <button class="inc" data-id="${item.id}">+</button>
-      </div>
-    `;
-    cartItemsContainer.appendChild(div);
-  });
 
-  const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
-  totalDiv.textContent = `Итого: ${total} ₸`;
+  function updateCartUI() {
+    if (cart.length === 0) {
+      cartItemsContainer.textContent = 'Корзина пуста'
+      totalDiv.textContent = 'Итого: 0'
+      return
+    }
+    cartItemsContainer.innerHTML = ''
+    cart.forEach(item => {
+      const div = document.createElement('div')
+      div.className = 'cart-item'
+      div.innerHTML = `
+        <div class="cart-item-name">${item.name} (${item.price} ₸)</div>
+        <div class="cart-item-qty">
+          <button class="dec" data-id="${item.id}">-</button>
+          <div>${item.qty}</div>
+          <button class="inc" data-id="${item.id}">+</button>
+        </div>
+      `
+      cartItemsContainer.appendChild(div)
+    })
 
-  cartItemsContainer.querySelectorAll('button.inc').forEach(btn => {
-    btn.onclick = () => {
-      const id = btn.getAttribute('data-id');
-      const item = cart.find(c => c.id == id);
-      if (item) {
-        item.qty++;
-        updateCartUI();
-      }
-    };
-  });
-  cartItemsContainer.querySelectorAll('button.dec').forEach(btn => {
-    btn.onclick = () => {
-      const id = btn.getAttribute('data-id');
-      const item = cart.find(c => c.id == id);
-      if (item) {
-        item.qty--;
-        if (item.qty <= 0) {
-          cart = cart.filter(c => c.id != id);
+    const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0)
+    totalDiv.textContent = `Итого: ${total} ₸`
+
+    cartItemsContainer.querySelectorAll('button.inc').forEach(btn => {
+      btn.onclick = () => {
+        const id = btn.getAttribute('data-id')
+        const item = cart.find(c => c.id == id)
+        if (item) {
+          item.qty++
+          updateCartUI()
         }
-        updateCartUI();
       }
-    };
-  });
-}
-
-orderForm.onsubmit = async e => {
-  e.preventDefault();
-  if (cart.length === 0) {
-    alert('Корзина пуста!');
-    return;
+    })
+    cartItemsContainer.querySelectorAll('button.dec').forEach(btn => {
+      btn.onclick = () => {
+        const id = btn.getAttribute('data-id')
+        const item = cart.find(c => c.id == id)
+        if (item) {
+          item.qty--
+          if (item.qty <= 0) {
+            cart = cart.filter(c => c.id != id)
+          }
+          updateCartUI()
+        }
+      }
+    })
   }
 
-  const name = document.getElementById('name').value.trim();
-  const phone = document.getElementById('phone').value.trim();
-  const address = document.getElementById('address').value.trim();
+  orderForm.onsubmit = async e => {
+    e.preventDefault()
+    if (cart.length === 0) {
+      alert('Корзина пуста!')
+      return
+    }
 
-  if (!name || !phone || !address) {
-    alert('Пожалуйста, заполните все поля.');
-    return;
+    const name = document.getElementById('name').value.trim()
+    const phone = document.getElementById('phone').value.trim()
+    const address = document.getElementById('address').value.trim()
+
+    if (!name || !phone || !address) {
+      alert('Пожалуйста, заполните все поля.')
+      return
+    }
+
+    const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0)
+    const productsText = cart.map(item => `${item.name} (${item.price} ₸) — ${item.qty} шт`).join('\n')
+
+    messageDiv.textContent = 'Отправка заказа...'
+    const { error } = await supabase.from('orders').insert([{ name, phone, address, products: productsText, total }])
+
+    if (error) {
+      messageDiv.style.color = 'red'
+      messageDiv.textContent = 'Ошибка при отправке заказа: ' + error.message
+    } else {
+      messageDiv.style.color = 'green'
+      messageDiv.textContent = 'Заказ успешно отправлен! Спасибо.'
+      cart = []
+      updateCartUI()
+      orderForm.reset()
+    }
   }
 
-  const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
-  const productsText = cart.map(item => `${item.name} (${item.price} ₸) — ${item.qty} шт`).join('\n');
+  loadProducts()
+  updateCartUI()
 
-  messageDiv.textContent = 'Отправка заказа...';
-  const { error } = await supabase.from('orders').insert([{ name, phone, address, products: productsText, total }]);
-
-  if (error) {
-    messageDiv.style.color = 'red';
-    messageDiv.textContent = 'Ошибка при отправке заказа: ' + error.message;
-  } else {
-    messageDiv.style.color = 'green';
-    messageDiv.textContent = 'Заказ успешно отправлен! Спасибо.';
-    cart = [];
-    updateCartUI();
-    orderForm.reset();
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js')
+      .then(() => console.log('✅ Service Worker зарегистрирован'))
+      .catch(e => console.error('❌ Ошибка регистрации Service Worker:', e))
   }
-};
-
-loadProducts();
-updateCartUI();
-
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('service-worker.js')
-    .then(() => console.log('✅ Service Worker зарегистрирован'))
-    .catch(e => console.error('❌ Ошибка регистрации Service Worker:', e));
-}
 </script>
 
 </body>
