@@ -333,32 +333,32 @@
     }
 
    function flyToCart(img) {
-  // Клонируем изображение
   const flyingImg = img.cloneNode(true);
   flyingImg.classList.add('flying-img');
   document.body.appendChild(flyingImg);
 
-  // Получаем координаты оригинального изображения и кнопки корзины
+  // Получаем координаты картинки на экране с учётом прокрутки
   const imgRect = img.getBoundingClientRect();
-  const cartBtnRect = cartButton.getBoundingClientRect();
 
-  // Устанавливаем начальную позицию летающего изображения — точно по картинке
-  flyingImg.style.left = imgRect.left + 'px';
-  flyingImg.style.top = imgRect.top + 'px';
+  // Начинаем позиционирование копии точно поверх картинки
+  flyingImg.style.left = `${imgRect.left}px`;
+  flyingImg.style.top = `${imgRect.top}px`;
+
+  // Получаем координаты кнопки корзины
+  const cartBtnRect = cartButton.getBoundingClientRect();
 
   // Запускаем анимацию на следующий кадр
   requestAnimationFrame(() => {
-    flyingImg.style.transform = `translate(${cartBtnRect.left - imgRect.left}px, ${
-      cartBtnRect.top - imgRect.top
-    }px) scale(0.1)`;
+    flyingImg.style.transform = `translate(${cartBtnRect.left - imgRect.left}px, ${cartBtnRect.top - imgRect.top}px) scale(0.1)`;
     flyingImg.style.opacity = '0.5';
   });
 
-  // По окончании анимации удаляем клонированное изображение
+  // После окончания анимации удаляем летающее изображение
   flyingImg.addEventListener('transitionend', () => {
     flyingImg.remove();
   }, { once: true });
 }
+
 
 
 
