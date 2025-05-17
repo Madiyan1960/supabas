@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Магазин</title>
   <style>
     body {
@@ -26,7 +26,7 @@
     .product-card {
       background: #fff;
       border-radius: 8px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
       padding: 10px;
       display: flex;
       flex-direction: column;
@@ -106,7 +106,7 @@
       background: #fff;
       padding: 15px;
       border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
       display: none;
       z-index: 1000;
     }
@@ -144,7 +144,8 @@
       margin-top: 10px;
     }
 
-    form input, form textarea {
+    form input,
+    form textarea {
       width: 100%;
       padding: 5px;
       margin: 5px 0;
@@ -164,6 +165,17 @@
       color: green;
       margin-top: 10px;
     }
+
+    /* Анимация полёта */
+    .flying-img {
+      position: fixed;
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+      pointer-events: none;
+      transition: transform 0.8s ease-in-out, opacity 0.8s ease-in-out;
+      z-index: 2000;
+    }
   </style>
 </head>
 <body>
@@ -171,7 +183,10 @@
   <div id="products">Загрузка товаров...</div>
 
   <button id="cart-button" title="Корзина">
-    <img src="https://cdn-icons-png.flaticon.com/512/1170/1170678.png" />
+    <img
+      src="https://cdn-icons-png.flaticon.com/512/1170/1170678.png"
+      alt="Корзина"
+    />
   </button>
 
   <div id="cart">
@@ -220,23 +235,54 @@
 
     function renderProducts() {
       productsContainer.innerHTML = '';
-      products.forEach(p => {
+      products.forEach((p) => {
         const card = document.createElement('div');
         card.className = 'product-card';
         card.innerHTML = `
-          <img src="${p.image_url || ''}" alt="${p.name}">
+          <img src="${p.image_url || ''}" alt="${p.name}" />
           <div class="product-name">${p.name}</div>
           <div class="product-price">${p.price} ₸</div>
           <button class="add-button">+</button>
         `;
-        card.querySelector('.add-button').onclick = () => addToCart(p.id);
+        const addButton = card.querySelector('.add-button');
+        addButton.onclick = (e) => {
+          flyToCart(card.querySelector('img'));
+          addToCart(p.id);
+        };
         productsContainer.appendChild(card);
       });
     }
 
+    function flyToCart(img) {
+      const flyingImg = img.cloneNode(true);
+      flyingImg.classList.add('flying-img');
+      document.body.appendChild(flyingImg);
+
+      const imgRect = img.getBoundingClientRect();
+      const cartBtnRect = cartButton.getBoundingClientRect();
+
+      flyingImg.style.left = imgRect.left + 'px';
+      flyingImg.style.top = imgRect.top + 'px';
+
+      requestAnimationFrame(() => {
+        flyingImg.style.transform = `translate(${cartBtnRect.left - imgRect.left}px, ${
+          cartBtnRect.top - imgRect.top
+        }px) scale(0.1)`;
+        flyingImg.style.opacity = '0.5';
+      });
+
+      flyingImg.addEventListener(
+        'transitionend',
+        () => {
+          flyingImg.remove();
+        },
+        { once: true }
+      );
+    }
+
     function addToCart(id) {
-      const product = products.find(p => p.id === id);
-      const item = cart.find(i => i.id === id);
+      const product = products.find((p) => p.id === id);
+      const item = cart.find((i) => i.id === id);
       if (item) item.qty++;
       else cart.push({ ...product, qty: 1 });
       updateCart();
@@ -249,7 +295,7 @@
         return;
       }
       cartItemsContainer.innerHTML = '';
-      cart.forEach(item => {
+      cart.forEach((item) => {
         const div = document.createElement('div');
         div.className = 'cart-item';
         div.innerHTML = `
@@ -260,7 +306,7 @@
         `;
         div.querySelectorAll('button')[0].onclick = () => {
           item.qty--;
-          if (item.qty <= 0) cart = cart.filter(i => i.id !== item.id);
+          if (item.qty <= 0) cart = cart.filter((i) => i.id !== item.id);
           updateCart();
         };
         div.querySelectorAll('button')[1].onclick = () => {
@@ -273,15 +319,15 @@
       totalDiv.textContent = `Итого: ${total} ₸`;
     }
 
-    orderForm.onsubmit = async e => {
+    orderForm.onsubmit = async (e) => {
       e.preventDefault();
       if (cart.length === 0) return alert('Корзина пуста!');
       const order = {
         name: document.getElementById('name').value,
         phone: document.getElementById('phone').value,
         address: document.getElementById('address').value,
-        products: cart.map(i => `${i.name} x${i.qty} (${i.price}₸)`).join(', '),
-        total: cart.reduce((sum, i) => sum + i.price * i.qty, 0)
+        products: cart.map((i) => `${i.name} x${i.qty} (${i.price}₸)`).join(', '),
+        total: cart.reduce((sum, i) => sum + i.price * i.qty, 0),
       };
       const { error } = await supabase.from('orders').insert([order]);
       if (error) {
