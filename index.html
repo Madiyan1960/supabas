@@ -1,130 +1,177 @@
-<!DOCTYPE html>  
+<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Магазин на Supabase</title>
+  <title>Магазин</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #f0f0f0; margin: 10px; }
-    h1 { text-align: center; font-weight: normal; }
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 10px;
+      background: #f5f5f5;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
     #products {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
       gap: 10px;
-      max-width: 480px;
-      margin: 0 auto;
     }
+
     .product-card {
       background: #fff;
-      padding: 10px 8px 12px;
       border-radius: 8px;
       box-shadow: 0 0 5px rgba(0,0,0,0.1);
-      text-align: center;
-      aspect-ratio: 1 / 1;
+      padding: 10px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      font-size: 14px;
-      user-select: none;
+      text-align: center;
+      height: 180px;
+      position: relative;
     }
+
     .product-card img {
-      max-height: 80px;
+      height: 80px;
       object-fit: contain;
       margin-bottom: 5px;
-      flex-shrink: 0;
     }
+
     .product-name {
-      font-weight: normal;
-      margin: 5px 0;
-      font-size: 0.9em;
+      font-size: 14px;
+      color: #333;
+      margin: 2px 0;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
-      line-height: 1.1em;
-      min-height: 2.2em;
-    }
-    .product-price {
-      color: green;
-      font-size: 0.85em;
-      margin-bottom: 5px;
-    }
-    .product-card button {
-      width: 32px;
-      height: 32px;
-      padding: 0;
-      border-radius: 6px;
-      font-size: 22px;
-      line-height: 1;
       font-weight: normal;
+    }
+
+    .product-price {
+      font-size: 13px;
+      color: green;
+      margin-bottom: 2px;
+    }
+
+    .add-button {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      width: 30px;
+      height: 30px;
       background: #2a9d8f;
       color: white;
       border: none;
+      border-radius: 6px;
+      font-size: 18px;
       cursor: pointer;
-      user-select: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 5px;
-      transition: background-color 0.3s ease;
+      line-height: 1;
     }
-    .product-card button:hover {
+
+    .add-button:hover {
       background: #21867a;
     }
-    #cart-toggle {
-      position: fixed; top: 10px; right: 10px; z-index: 1001; background: none; border: none;
+
+    #cart-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #e63946;
+      border: none;
+      z-index: 1001;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
     }
-    #cart-toggle img { width: 40px; }
+
+    #cart-button img {
+      width: 28px;
+      height: 28px;
+    }
+
     #cart {
-      position: fixed; top: 60px; right: 10px; background: white; padding: 10px;
-      width: 280px; max-height: 80vh; overflow-y: auto;
-      border: 1px solid #ccc; border-radius: 8px;
+      position: fixed;
+      bottom: 90px;
+      right: 10px;
+      width: 90%;
+      max-width: 320px;
+      background: #fff;
+      padding: 15px;
+      border-radius: 10px;
       box-shadow: 0 0 15px rgba(0,0,0,0.2);
-      display: none; z-index: 1000;
+      display: none;
+      z-index: 1000;
     }
-    #cart.open { display: block; }
+
+    #cart.open {
+      display: block;
+    }
+
     .cart-item {
       display: flex;
       justify-content: space-between;
-      align-items: center;
       margin-bottom: 8px;
+      font-size: 14px;
     }
+
     .cart-item-qty {
       display: flex;
+      gap: 4px;
       align-items: center;
-      gap: 5px;
     }
+
     .cart-item-qty button {
-      width: 20px;
-      height: 20px;
+      width: 22px;
+      height: 22px;
       padding: 0;
-      cursor: pointer;
-      border: 1px solid #2a9d8f;
+      border: none;
+      background: #ccc;
       border-radius: 4px;
-      background: white;
-      color: #2a9d8f;
-      font-weight: bold;
-      user-select: none;
+      cursor: pointer;
     }
-    #total { text-align: right; font-weight: bold; margin-top: 10px; }
+
+    #total {
+      text-align: right;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
     form input, form textarea {
       width: 100%;
-      margin: 5px 0;
       padding: 5px;
-      font-size: 14px;
-      box-sizing: border-box;
+      margin: 5px 0;
     }
-    form button { width: 100%; padding: 8px; font-size: 16px; background: #2a9d8f; color: white; border: none; border-radius: 6px; cursor: pointer; }
-    form button:hover { background: #21867a; }
-    #message { text-align: center; color: green; margin-top: 10px; font-weight: normal; }
+
+    form button {
+      width: 100%;
+      padding: 8px;
+      background: #2a9d8f;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+
+    #message {
+      text-align: center;
+      color: green;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
-  <h1>Магазин на Supabase</h1>
+  <h1>Магазин</h1>
   <div id="products">Загрузка товаров...</div>
 
-  <button id="cart-toggle" title="Открыть корзину">
-    <img id="cart-icon" src="https://cdn-icons-png.flaticon.com/512/1170/1170678.png" alt="Корзина" />
+  <button id="cart-button" title="Корзина">
+    <img src="https://cdn-icons-png.flaticon.com/512/1170/1170678.png" />
   </button>
 
   <div id="cart">
@@ -134,8 +181,8 @@
     <form id="orderForm">
       <input type="text" id="name" placeholder="Имя" required />
       <input type="tel" id="phone" placeholder="Телефон" required />
-      <textarea id="address" placeholder="Адрес" rows="2" required></textarea>
-      <button type="submit">Отправить заказ</button>
+      <textarea id="address" placeholder="Адрес" required></textarea>
+      <button type="submit">Оформить заказ</button>
     </form>
     <div id="message"></div>
   </div>
@@ -145,22 +192,21 @@
 
     const supabase = createClient(
       'https://kpefeonxvgnfpgevkcwy.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtwZWZlb254dmduZnBnZXZrY3d5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyMzY4MDgsImV4cCI6MjA2MjgxMjgwOH0.aZJhwODNOS3FhyT8k-qAAfvo0NaYbv4QSm6SwuNaeys'
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtwZWZlb254dmduZnBnZXZrY3d5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyMzY4MDgsImV4cCI6MjA2MjgxMjgwOH0.aZJhwODNOS3FhyT8k-qAAfvo0NaYbv4QSm6SwuNaeys' // замените на ваш реальный ключ, если нужно
     );
 
     const productsContainer = document.getElementById('products');
-    const cartToggle = document.getElementById('cart-toggle');
     const cartPanel = document.getElementById('cart');
+    const cartButton = document.getElementById('cart-button');
     const cartItemsContainer = document.getElementById('cartItems');
     const totalDiv = document.getElementById('total');
     const orderForm = document.getElementById('orderForm');
     const messageDiv = document.getElementById('message');
-    const cartIcon = document.getElementById('cart-icon');
 
     let products = [];
     let cart = [];
 
-    cartToggle.addEventListener('click', () => cartPanel.classList.toggle('open'));
+    cartButton.addEventListener('click', () => cartPanel.classList.toggle('open'));
 
     async function loadProducts() {
       const { data, error } = await supabase.from('products').select('*');
@@ -178,15 +224,12 @@
         const card = document.createElement('div');
         card.className = 'product-card';
         card.innerHTML = `
-          <img src="${p.image_url || ''}" alt="${p.name}" />
+          <img src="${p.image_url || ''}" alt="${p.name}">
           <div class="product-name">${p.name}</div>
           <div class="product-price">${p.price} ₸</div>
-          <button>+</button>
+          <button class="add-button">+</button>
         `;
-        card.querySelector('button').addEventListener('click', () => {
-          addToCart(p.id);
-          flyToCart(card.querySelector('img'));
-        });
+        card.querySelector('.add-button').onclick = () => addToCart(p.id);
         productsContainer.appendChild(card);
       });
     }
@@ -197,26 +240,6 @@
       if (item) item.qty++;
       else cart.push({ ...product, qty: 1 });
       updateCart();
-    }
-
-    function flyToCart(img) {
-      const clone = img.cloneNode(true);
-      const rect = img.getBoundingClientRect();
-      const cartRect = cartIcon.getBoundingClientRect();
-      Object.assign(clone.style, {
-        position: 'fixed', left: rect.left + 'px', top: rect.top + 'px',
-        width: rect.width + 'px', transition: 'all 0.7s ease-in-out',
-        zIndex: 1000
-      });
-      document.body.appendChild(clone);
-      requestAnimationFrame(() => {
-        Object.assign(clone.style, {
-          left: cartRect.left + 'px',
-          top: cartRect.top + 'px',
-          width: '20px', opacity: '0.5'
-        });
-      });
-      setTimeout(() => clone.remove(), 700);
     }
 
     function updateCart() {
@@ -230,7 +253,7 @@
         const div = document.createElement('div');
         div.className = 'cart-item';
         div.innerHTML = `
-          <span>${item.name} (${item.price} ₸)</span>
+          <span>${item.name} (${item.price}₸)</span>
           <div class="cart-item-qty">
             <button>-</button><span>${item.qty}</span><button>+</button>
           </div>
@@ -257,7 +280,7 @@
         name: document.getElementById('name').value,
         phone: document.getElementById('phone').value,
         address: document.getElementById('address').value,
-        products: cart.map(i => `${i.name} x${i.qty} (${i.price}₸)`).join(', '),
+        products: cart.map(i => `${i.name} x${i.qty}`).join(', '),
         total: cart.reduce((sum, i) => sum + i.price * i.qty, 0)
       };
       const { error } = await supabase.from('orders').insert([order]);
