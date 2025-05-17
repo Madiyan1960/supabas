@@ -1,387 +1,346 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Магазин на Supabase</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    margin: 0; padding: 0;
-    background: #f9f9f9;
-  }
-  h1 {
-    text-align: center;
-    margin: 20px 0;
-  }
-  #products {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 12px;
-  padding: 10px;
-}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Магазин</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 10px;
+      background: #f5f5f5;
+    }
 
-  .product {
-    background: white;
-    width: 160px;
-    border-radius: 8px;
-    box-shadow: 0 0 8px #ccc;
-    padding: 10px;
-    text-align: center;
-    position: relative;
-  }
-  .product img {
-    width: 100%;
-    border-radius: 6px;
-  }
-  .product h3 {
-    font-size: 1rem;
-    margin: 8px 0 4px;
-  }
-  .product .price {
-    font-weight: bold;
-    margin-bottom: 8px;
-  }
-  .product button {
-    background: #ffbb00;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background 0.3s;
-  }
-  .product button:hover {
-    background: #e6a600;
-  }
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
 
-  /* Панель корзины внизу */
-  #cartBar {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    background: #ffbb00;
-    color: black;
-    font-weight: bold;
-    display: none;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-    box-shadow: 0 -2px 8px rgba(0,0,0,0.2);
-    cursor: pointer;
-    z-index: 1000;
-  }
+    #products {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 10px;
+    }
 
-  /* Модальное окно корзины */
-  #cartModal {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.6);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 1100;
-  }
-  #cartModal.active {
-    display: flex;
-  }
-  #cartContent {
-    background: white;
-    max-width: 400px;
-    width: 90%;
-    max-height: 80vh;
-    overflow-y: auto;
-    border-radius: 8px;
-    padding: 20px;
-    position: relative;
-  }
-  #cartContent h2 {
-    margin-top: 0;
-  }
-  #closeCart {
-    position: absolute;
-    right: 15px;
-    top: 15px;
-    font-size: 20px;
-    cursor: pointer;
-    border: none;
-    background: transparent;
-  }
-  #cartItems {
-    margin-bottom: 20px;
-  }
-  .cart-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-  }
-  .cart-item span {
-    flex: 1;
-  }
-  .cart-item button {
-    margin: 0 4px;
-    background: #ffbb00;
-    border: none;
-    border-radius: 4px;
-    padding: 4px 8px;
-    cursor: pointer;
-  }
-  .cart-item button:hover {
-    background: #e6a600;
-  }
-  form label {
-    display: block;
-    margin-bottom: 6px;
-    font-weight: bold;
-  }
-  form input {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 12px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    box-sizing: border-box;
-  }
-  form button[type="submit"] {
-    width: 100%;
-    background: #ffbb00;
-    border: none;
-    padding: 10px;
-    font-weight: bold;
-    border-radius: 6px;
-    cursor: pointer;
-  }
-  form button[type="submit"]:hover {
-    background: #e6a600;
-  }
-</style>
+    .product-card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      text-align: center;
+      height: 180px;
+      position: relative;
+    }
+
+    .product-card img {
+      height: 80px;
+      object-fit: contain;
+      margin-bottom: 5px;
+    }
+
+    .product-name {
+      font-size: 14px;
+      color: #333;
+      margin: 2px 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      font-weight: normal;
+    }
+
+    .product-price {
+      font-size: 13px;
+      color: green;
+      margin-bottom: 2px;
+    }
+
+    .add-button {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      width: 30px;
+      height: 30px;
+      background: #2a9d8f;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 18px;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .add-button:hover {
+      background: #21867a;
+    }
+
+    #cart-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #e63946;
+      border: none;
+      z-index: 1001;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+    }
+
+    #cart-button img {
+      width: 28px;
+      height: 28px;
+    }
+
+    #cart {
+      position: fixed;
+      bottom: 90px;
+      right: 10px;
+      width: 90%;
+      max-width: 320px;
+      background: #fff;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+      display: none;
+      z-index: 1000;
+    }
+
+    #cart.open {
+      display: block;
+    }
+
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .cart-item-qty {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .cart-item-qty button {
+      width: 22px;
+      height: 22px;
+      padding: 0;
+      border: none;
+      background: #ccc;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #total {
+      text-align: right;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    form input,
+    form textarea {
+      width: 100%;
+      padding: 5px;
+      margin: 5px 0;
+    }
+
+    form button {
+      width: 100%;
+      padding: 8px;
+      background: #2a9d8f;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+
+    #message {
+      text-align: center;
+      color: green;
+      margin-top: 10px;
+    }
+
+    /* Анимация полёта */
+    .flying-img {
+      position: fixed;
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+      pointer-events: none;
+      transition: transform 0.8s ease-in-out, opacity 0.8s ease-in-out;
+      z-index: 2000;
+    }
+  </style>
 </head>
 <body>
-<h1>Магазин</h1>
-<div id="products">Загрузка товаров...</div>
+  <h1>Магазин</h1>
+  <div id="products">Загрузка товаров...</div>
 
-<!-- Панель корзины -->
-<div id="cartBar">
-  <span id="cartCount">0 товаров</span>
-  <button id="openCart">Корзина</button>
-</div>
+  <button id="cart-button" title="Корзина">
+    <img
+      src="https://cdn-icons-png.flaticon.com/512/1170/1170678.png"
+      alt="Корзина"
+    />
+  </button>
 
-<!-- Модальное окно корзины -->
-<div id="cartModal">
-  <div id="cartContent">
-    <button id="closeCart" title="Закрыть">&times;</button>
-    <h2>Ваша корзина</h2>
-    <div id="cartItems"></div>
+  <div id="cart">
+    <h2>Корзина</h2>
+    <div id="cartItems">Корзина пуста</div>
+    <div id="total">Итого: 0 ₸</div>
     <form id="orderForm">
-      <label for="name">Имя:</label>
-      <input type="text" id="name" name="name" required />
-      <label for="phone">Телефон:</label>
-      <input type="tel" id="phone" name="phone" required pattern="[\d\s()+-]{5,}" placeholder="+7 777 777 77 77" />
-      <label for="address">Адрес:</label>
-      <input type="text" id="address" name="address" required />
+      <input type="text" id="name" placeholder="Имя" required />
+      <input type="tel" id="phone" placeholder="Телефон" required />
+      <textarea id="address" placeholder="Адрес" required></textarea>
       <button type="submit">Оформить заказ</button>
     </form>
+    <div id="message"></div>
   </div>
-</div>
 
-<script type="module">
-// Подключение Supabase
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-const supabaseUrl = 'https://kpefeonxvgnfpgevkcwy.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtwZWZlb254dmduZnBnZXZrY3d5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyMzY4MDgsImV4cCI6MjA2MjgxMjgwOH0.aZJhwODNOS3FhyT8k-qAAfvo0NaYbv4QSm6SwuNaeys'; // Замените на свой ключ
-const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabase = createClient(
+      'https://kpefeonxvgnfpgevkcwy.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtwZWZlb254dmduZnBnZXZrY3d5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyMzY4MDgsImV4cCI6MjA2MjgxMjgwOH0.aZJhwODNOS3FhyT8k-qAAfvo0NaYbv4QSm6SwuNaeys'
+    );
 
-const productsContainer = document.getElementById('products');
-const cartBar = document.getElementById('cartBar');
-const cartCount = document.getElementById('cartCount');
-const openCartBtn = document.getElementById('openCart');
-const cartModal = document.getElementById('cartModal');
-const closeCartBtn = document.getElementById('closeCart');
-const cartItemsContainer = document.getElementById('cartItems');
-const orderForm = document.getElementById('orderForm');
+    const productsContainer = document.getElementById('products');
+    const cartPanel = document.getElementById('cart');
+    const cartButton = document.getElementById('cart-button');
+    const cartItemsContainer = document.getElementById('cartItems');
+    const totalDiv = document.getElementById('total');
+    const orderForm = document.getElementById('orderForm');
+    const messageDiv = document.getElementById('message');
 
-let products = [];
-let cart = [];
+    let products = [];
+    let cart = [];
 
-async function loadProducts() {
-  productsContainer.textContent = 'Загрузка товаров...';
-  const { data, error } = await supabase
-    .from('orders')
-    .select('*')
-    .order('id', { ascending: true });
-  if (error) {
-    productsContainer.textContent = 'Ошибка загрузки товаров.';
-    console.error(error);
-    return;
-  }
-  products = data;
-  renderProducts();
-}
+    cartButton.addEventListener('click', () => cartPanel.classList.toggle('open'));
 
-function renderProducts() {
-  productsContainer.innerHTML = '';
-  if (products.length === 0) {
-    productsContainer.textContent = 'Товаров нет.';
-    return;
-  }
-  products.forEach(product => {
-    const div = document.createElement('div');
-    div.className = 'product';
-    div.innerHTML = `
-      <img src="${product.image_url || 'https://via.placeholder.com/150'}" alt="${product.name}" />
-      <h3>${product.name}</h3>
-      <div class="price">${product.price} ₸</div>
-      <button>+</button>
-    `;
-    const btn = div.querySelector('button');
-    btn.onclick = () => {
-  animateFlyToCart(div.querySelector('img'));
-  addToCart(product);
-};
-
-    productsContainer.appendChild(div);
-  });
-}
-
-function addToCart(product) {
-  const existing = cart.find(item => item.id === product.id);
-  if (existing) {
-    existing.qty++;
-  } else {
-    cart.push({ ...product, qty: 1 });
-  }
-  updateCart();
-  showCartBar();
-}
-
-function updateCart() {
-  const totalCount = cart.reduce((acc, item) => acc + item.qty, 0);
-  cartCount.textContent = totalCount + (totalCount === 1 ? ' товар' : ' товаров');
-  if (totalCount === 0) {
-    cartBar.style.display = 'none';
-  } else {
-    cartBar.style.display = 'flex';
-  }
-  renderCartItems();
-}
-
-function renderCartItems() {
-  cartItemsContainer.innerHTML = '';
-  if (cart.length === 0) {
-    cartItemsContainer.textContent = 'Корзина пуста.';
-    return;
-  }
-  cart.forEach(item => {
-    const div = document.createElement('div');
-    div.className = 'cart-item';
-    div.innerHTML = `
-      <span>${item.name} — ${item.price} ₸ x ${item.qty} = ${item.price * item.qty} ₸</span>
-      <div>
-        <button class="minus">−</button>
-        <button class="plus">+</button>
-        <button class="remove" title="Удалить">×</button>
-      </div>
-    `;
-    const btnMinus = div.querySelector('.minus');
-    const btnPlus = div.querySelector('.plus');
-    const btnRemove = div.querySelector('.remove');
-
-    btnMinus.onclick = () => {
-      item.qty--;
-      if (item.qty <= 0) {
-        cart = cart.filter(i => i.id !== item.id);
+    async function loadProducts() {
+      const { data, error } = await supabase.from('products').select('*');
+      if (error) {
+        productsContainer.textContent = 'Ошибка загрузки!';
+        return;
       }
+      products = data;
+      renderProducts();
+    }
+
+    function renderProducts() {
+      productsContainer.innerHTML = '';
+      products.forEach((p) => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.innerHTML = `
+          <img src="${p.image_url || ''}" alt="${p.name}" />
+          <div class="product-name">${p.name}</div>
+          <div class="product-price">${p.price} ₸</div>
+          <button class="add-button">+</button>
+        `;
+        const addButton = card.querySelector('.add-button');
+        addButton.onclick = (e) => {
+          flyToCart(card.querySelector('img'));
+          addToCart(p.id);
+        };
+        productsContainer.appendChild(card);
+      });
+    }
+
+    function flyToCart(img) {
+      const flyingImg = img.cloneNode(true);
+      flyingImg.classList.add('flying-img');
+      document.body.appendChild(flyingImg);
+
+      const imgRect = img.getBoundingClientRect();
+      const cartBtnRect = cartButton.getBoundingClientRect();
+
+      flyingImg.style.left = imgRect.left + 'px';
+      flyingImg.style.top = imgRect.top + 'px';
+
+      requestAnimationFrame(() => {
+        flyingImg.style.transform = `translate(${cartBtnRect.left - imgRect.left}px, ${
+          cartBtnRect.top - imgRect.top
+        }px) scale(0.1)`;
+        flyingImg.style.opacity = '0.5';
+      });
+
+      flyingImg.addEventListener(
+        'transitionend',
+        () => {
+          flyingImg.remove();
+        },
+        { once: true }
+      );
+    }
+
+    function addToCart(id) {
+      const product = products.find((p) => p.id === id);
+      const item = cart.find((i) => i.id === id);
+      if (item) item.qty++;
+      else cart.push({ ...product, qty: 1 });
       updateCart();
+    }
+
+    function updateCart() {
+      if (cart.length === 0) {
+        cartItemsContainer.textContent = 'Корзина пуста';
+        totalDiv.textContent = 'Итого: 0 ₸';
+        return;
+      }
+      cartItemsContainer.innerHTML = '';
+      cart.forEach((item) => {
+        const div = document.createElement('div');
+        div.className = 'cart-item';
+        div.innerHTML = `
+          <span>${item.name} (${item.price}₸)</span>
+          <div class="cart-item-qty">
+            <button>-</button><span>${item.qty}</span><button>+</button>
+          </div>
+        `;
+        div.querySelectorAll('button')[0].onclick = () => {
+          item.qty--;
+          if (item.qty <= 0) cart = cart.filter((i) => i.id !== item.id);
+          updateCart();
+        };
+        div.querySelectorAll('button')[1].onclick = () => {
+          item.qty++;
+          updateCart();
+        };
+        cartItemsContainer.appendChild(div);
+      });
+      const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+      totalDiv.textContent = `Итого: ${total} ₸`;
+    }
+
+    orderForm.onsubmit = async (e) => {
+      e.preventDefault();
+      if (cart.length === 0) return alert('Корзина пуста!');
+      const order = {
+        name: document.getElementById('name').value,
+        phone: document.getElementById('phone').value,
+        address: document.getElementById('address').value,
+        products: cart.map((i) => `${i.name} x${i.qty} (${i.price}₸)`).join(', '),
+        total: cart.reduce((sum, i) => sum + i.price * i.qty, 0),
+      };
+      const { error } = await supabase.from('orders').insert([order]);
+      if (error) {
+        messageDiv.textContent = 'Ошибка отправки заказа';
+      } else {
+        messageDiv.textContent = 'Заказ отправлен!';
+        cart = [];
+        updateCart();
+        orderForm.reset();
+      }
     };
-    btnPlus.onclick = () => {
-      item.qty++;
-      updateCart();
-    };
-    btnRemove.onclick = () => {
-      cart = cart.filter(i => i.id !== item.id);
-      updateCart();
-    };
 
-    cartItemsContainer.appendChild(div);
-  });
-}
-
-function showCartBar() {
-  if (cart.length > 0) {
-    cartBar.style.display = 'flex';
-  }
-}
-
-openCartBtn.onclick = () => {
-  cartModal.classList.add('active');
-};
-
-closeCartBtn.onclick = () => {
-  cartModal.classList.remove('active');
-};
-
-orderForm.onsubmit = (e) => {
-  e.preventDefault();
-  if (cart.length === 0) {
-    alert('Корзина пуста!');
-    return;
-  }
-  const formData = new FormData(orderForm);
-  const name = formData.get('name').trim();
-  const phone = formData.get('phone').trim();
-  const address = formData.get('address').trim();
-
-  if (!name || !phone || !address) {
-    alert('Пожалуйста, заполните все поля.');
-    return;
-  }
-
-  // Формируем текст заказа
-  let orderText = `Заказ от ${name}\nТелефон: ${phone}\nАдрес: ${address}\n\nТовары:\n`;
-  cart.forEach(item => {
-    orderText += `${item.name} — ${item.qty} шт. — ${item.price * item.qty} ₸\n`;
-  });
-  const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
-  orderText += `\nИтого: ${total} ₸`;
-
-  alert(orderText);
-
-  // Очистка
-  cart = [];
-  updateCart();
-  orderForm.reset();
-  cartModal.classList.remove('active');
-};
-
-loadProducts();
-updateCart();
-  function animateFlyToCart(imgEl) {
-  const cartBtn = document.getElementById('openCart');
-  const imgRect = imgEl.getBoundingClientRect();
-  const cartRect = cartBtn.getBoundingClientRect();
-
-  const clone = imgEl.cloneNode();
-  clone.style.position = 'fixed';
-  clone.style.left = imgRect.left + 'px';
-  clone.style.top = imgRect.top + 'px';
-  clone.style.width = imgRect.width + 'px';
-  clone.style.transition = 'all 0.8s ease-in-out';
-  clone.style.zIndex = 9999;
-  document.body.appendChild(clone);
-
-  requestAnimationFrame(() => {
-    clone.style.left = cartRect.left + 'px';
-    clone.style.top = cartRect.top + 'px';
-    clone.style.width = '20px';
-    clone.style.opacity = '0.5';
-  });
-
-  setTimeout(() => {
-    clone.remove();
-  }, 800);
-}
-
-</script>
+    loadProducts();
+  </script>
 </body>
 </html>
