@@ -82,51 +82,32 @@
       background: #21867a;
     }
 
-    #cart-button {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: #f0c419; /* ярко-жёлтый */
-      border: none;
-      z-index: 1001;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #333;
-      font-size: 30px;
-      font-weight: bold;
-      user-select: none;
-    }
-
-    #cart-button:hover {
-      background: #d4b30a;
-    }
-
-    /* Индикатор количества и суммы рядом с кнопкой корзины */
-    #cart-indicator {
-      position: fixed;
-      bottom: 85px;
-      right: 20px;
-      background: #f0c419;
-      padding: 6px 10px;
-      border-radius: 12px;
-      font-weight: bold;
-      font-size: 14px;
-      color: #333;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      user-select: none;
-      min-width: 100px;
-      text-align: center;
-      pointer-events: none; /* чтобы не мешал нажатию на кнопку */
-    }
-
+    /* Жёлтая корзина снизу */
     #cart {
-      display: none; /* Оставляем скрытой, как было */
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #f0c419;
+      box-shadow: 0 -4px 8px rgba(0,0,0,0.2);
+      padding: 10px 20px;
+      font-weight: bold;
+      font-size: 16px;
+      color: #333;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+      z-index: 1000;
+      min-height: 50px;
+    }
+
+    #cart .info {
+      user-select: none;
+    }
+
+    #cart .info span {
+      margin-right: 15px;
     }
   </style>
 </head>
@@ -134,8 +115,12 @@
   <h1>Магазин</h1>
   <div id="products">Загрузка товаров...</div>
 
-  <button id="cart-button" title="Корзина">🛒</button>
-  <div id="cart-indicator" style="display:none;">0 товаров — 0 ₸</div>
+  <div id="cart" style="display:none;">
+    <div class="info">
+      <span id="cart-count">0 товаров</span>
+      <span id="cart-total">0 ₸</span>
+    </div>
+  </div>
 
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
@@ -146,16 +131,12 @@
     );
 
     const productsContainer = document.getElementById('products');
-    const cartButton = document.getElementById('cart-button');
-    const cartIndicator = document.getElementById('cart-indicator');
+    const cartEl = document.getElementById('cart');
+    const cartCountEl = document.getElementById('cart-count');
+    const cartTotalEl = document.getElementById('cart-total');
 
     let products = [];
     let cart = [];
-
-    cartButton.addEventListener('click', () => {
-      alert('Здесь могла быть ваша корзина :)');
-      // Тут можно добавить открытие панели корзины, если захочешь
-    });
 
     async function loadProducts() {
       const { data, error } = await supabase.from('products').select('*');
@@ -205,7 +186,7 @@
       }
 
       const imgRect = img.getBoundingClientRect();
-      const cartBtnRect = cartButton.getBoundingClientRect();
+      const cartRect = cartEl.getBoundingClientRect();
 
       const flyingImg = img.cloneNode(true);
       flyingImg.style.position = 'fixed';
@@ -220,8 +201,8 @@
       document.body.appendChild(flyingImg);
 
       requestAnimationFrame(() => {
-        flyingImg.style.left = (cartBtnRect.left + cartBtnRect.width / 2 - imgRect.width / 4) + 'px';
-        flyingImg.style.top = (cartBtnRect.top + cartBtnRect.height / 2 - imgRect.height / 4) + 'px';
+        flyingImg.style.left = (cartRect.left + cartRect.width / 4) + 'px';
+        flyingImg.style.top = (cartRect.top + cartRect.height / 2 - imgRect.height / 4) + 'px';
         flyingImg.style.width = imgRect.width / 2 + 'px';
         flyingImg.style.height = imgRect.height / 2 + 'px';
         flyingImg.style.opacity = '0.5';
@@ -235,19 +216,13 @@
 
     function updateCart() {
       if (cart.length === 0) {
-        cartIndicator.style.display = 'none';
+        cartEl.style.display = 'none';
         return;
       }
-      cartIndicator.style.display = 'block';
+      cartEl.style.display = 'flex';
 
       const totalQty = cart.reduce((sum, i) => sum + i.qty, 0);
       const totalPrice = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
 
-      cartIndicator.textContent = `${totalQty} товар${totalQty % 10 === 1 && totalQty !== 11 ? '' : totalQty % 10 >= 2 && totalQty % 10 <= 4 && !(totalQty >= 12 && totalQty <= 14) ? 'а' : 'ов'} — ${totalPrice} ₸`;
-    }
-
-    loadProducts();
-    updateCart();
-  </script>
-</body>
-</html>
+      cartCountEl.textContent = `${totalQty} товар${getEnding(totalQty)}`;
+      cartTotalEl.textContent = `${totalPrice
