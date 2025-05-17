@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
@@ -7,16 +7,40 @@
   <style>
     body { font-family: Arial; background: #f0f0f0; margin: 10px; }
     h1 { text-align: center; }
-    #products { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
-    .product-card { background: #fff; padding: 10px; border-radius: 8px; box-shadow: 0 0 5px rgba(0,0,0,0.1); text-align: center; }
-    .product-card img { width: 100px; height: 100px; object-fit: contain; }
+    #products { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
+      gap: 10px; 
+    }
+    .product-card { 
+      background: #fff; 
+      border-radius: 8px; 
+      box-shadow: 0 0 5px rgba(0,0,0,0.1); 
+      text-align: center; 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: space-between; 
+      aspect-ratio: 1 / 1; 
+      padding: 10px;
+    }
+    .product-card img { 
+      width: 100%; 
+      height: auto; 
+      max-height: 100px; 
+      object-fit: contain; 
+    }
     .product-name { font-weight: bold; margin: 5px 0; }
     .product-price { color: green; margin-bottom: 5px; }
     button { padding: 5px 10px; border: none; background: #2a9d8f; color: white; border-radius: 5px; cursor: pointer; }
     button:hover { background: #21867a; }
     #cart-toggle { position: fixed; top: 10px; right: 10px; z-index: 1001; background: none; border: none; }
     #cart-toggle img { width: 40px; }
-    #cart { position: fixed; top: 60px; right: 10px; background: white; padding: 10px; width: 280px; max-height: 80vh; overflow-y: auto; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 0 15px rgba(0,0,0,0.2); display: none; z-index: 1000; }
+    #cart { 
+      position: fixed; top: 60px; right: 10px; background: white; 
+      padding: 10px; width: 280px; max-height: 80vh; overflow-y: auto; 
+      border: 1px solid #ccc; border-radius: 8px; 
+      box-shadow: 0 0 15px rgba(0,0,0,0.2); display: none; z-index: 1000; 
+    }
     #cart.open { display: block; }
     .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
     .cart-item-qty { display: flex; align-items: center; gap: 5px; }
@@ -165,7 +189,7 @@
         name: document.getElementById('name').value,
         phone: document.getElementById('phone').value,
         address: document.getElementById('address').value,
-        products: cart.map(i => `${i.name} x${i.qty}`).join(', '),
+        products: cart.map(i => `${i.name} x${i.qty} (${i.price}₸)`).join(', '),
         total: cart.reduce((sum, i) => sum + i.price * i.qty, 0)
       };
       const { error } = await supabase.from('orders').insert([order]);
