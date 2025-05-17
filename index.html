@@ -207,7 +207,7 @@ let cart = [];
 async function loadProducts() {
   productsContainer.textContent = 'Загрузка товаров...';
   const { data, error } = await supabase
-    .from('products')
+    .from('orders')
     .select('*')
     .order('id', { ascending: true });
   if (error) {
