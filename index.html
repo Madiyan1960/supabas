@@ -455,9 +455,12 @@ orderForm.addEventListener('submit', async (e) => {
 
   // Формируем список продуктов с количеством
   const productsList = cart.map(({ id, qty }) => {
-    const product = products.find(p => p.id === id);
-    return product ? `${product.name} ×${qty}` : '';
-  }).filter(Boolean).join(', ');
+  const product = products.find(p => p.id === id);
+  if (!product) return '';
+  const totalPrice = product.price * qty;
+  return `${product.name} x${qty} (${totalPrice}₸)`;
+}).filter(Boolean).join(', ');
+
 
   const total = cart.reduce((sum, { id, qty }) => {
     const product = products.find(p => p.id === id);
