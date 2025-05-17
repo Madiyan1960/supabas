@@ -137,6 +137,46 @@
       color: green;
       margin-top: 8px;
     }
+    @media (min-width: 600px) {
+  #products {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+
+  #cart {
+    max-width: 300px;
+    top: 60px;
+  }
+
+  #cart-toggle img {
+    width: 50px;
+  }
+}
+
+@media (max-width: 599px) {
+  .product-card img {
+    height: 80px;
+  }
+
+  .cart-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cart-item-qty {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  #orderForm input,
+  #orderForm textarea {
+    font-size: 16px;
+  }
+
+  #cart {
+    width: 95vw;
+  }
+}
+
   </style>
 </head>
 <body>
