@@ -325,7 +325,7 @@
     }
 
     const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0)
-    const productsText = cart.map(item => `${item.name} (${item.price} ₸) — ${item.qty} шт`).join('\n')
+    const productsText = cart.map(item => `${item.name} (${item.price} ₸) — ${item.qty}${item.unit}`).join('\n')
 
     messageDiv.textContent = 'Отправка заказа...'
     const { error } = await supabase.from('orders').insert([{ name, phone, address, products: productsText, total }])
