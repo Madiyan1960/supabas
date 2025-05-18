@@ -51,18 +51,29 @@
       background: #21867a;
     }
 
-    #cart-toggle {
-      position: fixed;
-      right: 10px;
-      top: 10px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      z-index: 1001;
-    }
-    #cart-toggle img {
-      width: 40px;
-    }
+   #cart-toggle {
+  display: flex;
+  flex-direction: column; /* Вертикальное расположение */
+  align-items: center;    /* Выравнивание по центру по горизонтали */
+  background: #ffeb3b;
+  border-radius: 8px;
+  padding: 6px;
+  cursor: pointer;
+  border: none;
+  gap: 4px; /* Расстояние между иконкой и текстом */
+}
+
+#cart-toggle img {
+  width: 40px;
+  height: 40px;
+  display: block;
+}
+
+#cart-text {
+  font-size: 12px;
+  color: black;
+}
+
 
     #cart-toggle {
   background: #ffeb3b; /* цвет фона кнопки */
