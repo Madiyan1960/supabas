@@ -209,6 +209,30 @@
   const cartPanel = document.getElementById('cart')
   const toggleButton = document.getElementById('cart-toggle')
 
+    window.addEventListener("DOMContentLoaded", function () {
+      const nameInput = document.getElementById("name");
+      const phoneInput = document.getElementById("phone");
+      const addressInput = document.getElementById("address");
+
+      // Загрузка сохранённых данных
+      nameInput.value = localStorage.getItem("name") || "";
+      phoneInput.value = localStorage.getItem("phone") || "";
+      addressInput.value = localStorage.getItem("address") || "";
+
+      // Сохранение при вводе
+      nameInput.addEventListener("input", () => {
+        localStorage.setItem("name", nameInput.value);
+      });
+
+      phoneInput.addEventListener("input", () => {
+        localStorage.setItem("phone", phoneInput.value);
+      });
+
+      addressInput.addEventListener("input", () => {
+        localStorage.setItem("address", addressInput.value);
+      });
+    });
+  
   toggleButton.addEventListener('click', () => {
     cartPanel.classList.toggle('open')
   })
@@ -386,30 +410,6 @@
       .catch(e => console.error('❌ Ошибка регистрации Service Worker:', e))
   }
 </script>
- <script>
-    window.addEventListener("DOMContentLoaded", function () {
-      const nameInput = document.getElementById("name");
-      const phoneInput = document.getElementById("phone");
-      const addressInput = document.getElementById("address");
-
-      // Загрузка сохранённых данных
-      nameInput.value = localStorage.getItem("name") || "";
-      phoneInput.value = localStorage.getItem("phone") || "";
-      addressInput.value = localStorage.getItem("address") || "";
-
-      // Сохранение при вводе
-      nameInput.addEventListener("input", () => {
-        localStorage.setItem("name", nameInput.value);
-      });
-
-      phoneInput.addEventListener("input", () => {
-        localStorage.setItem("phone", phoneInput.value);
-      });
-
-      addressInput.addEventListener("input", () => {
-        localStorage.setItem("address", addressInput.value);
-      });
-    });
-  </script>
+ 
 </body>
 </html>
