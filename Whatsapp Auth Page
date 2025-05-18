@@ -4,7 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Подтверждение через WhatsApp</title>
-  <script type="module" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"></script>
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+    window.supabase = createClient(
+      'https://kpefeonxvgnfpgevkcwy.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtwZWZlb254dmduZnBnZXZrY3d5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyMzY4MDgsImV4cCI6MjA2MjgxMjgwOH0.aZJhwODNOS3FhyT8k-qAAfvo0NaYbv4QSm6SwuNaeys'
+    );
+  </script>
   <style>
     body {
       font-family: sans-serif;
@@ -74,13 +80,8 @@
     <div id="whatsapp-instruction" class="instruction" style="display:none;"></div>
   </div>
 
-  <script type="module">
-    const supabase = createClient(
-      'https://ВАШ_ПРОЕКТ.supabase.co',
-      'ВАШ_АНОН_КЛЮЧ'
-    )
-
-    window.generateCode = async function () {
+  <script>
+    async function generateCode() {
       const name = document.getElementById('name').value.trim()
       const phone = document.getElementById('phone').value.trim()
       const infoBox = document.getElementById('whatsapp-instruction')
