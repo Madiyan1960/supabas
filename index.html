@@ -84,6 +84,7 @@
       font-size: 20px;
       cursor: pointer;
       z-index: 1001;
+      user-select: none;
     }
 
     #cartPanel {
@@ -125,6 +126,7 @@
       background: #ccc;
       border-radius: 4px;
       cursor: pointer;
+      user-select: none;
     }
 
     #total {
@@ -149,12 +151,14 @@
       border-radius: 5px;
       margin-top: 10px;
       font-size: 16px;
+      cursor: pointer;
     }
 
     #message {
       color: green;
       text-align: center;
       margin-top: 10px;
+      min-height: 20px;
     }
 
     .flying-img {
@@ -205,10 +209,19 @@
     const cartPanel = document.getElementById('cartPanel');
 
     let products = [];
-    let cart = [];
+    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
 
     cartIcon.addEventListener('click', () => {
       cartPanel.classList.toggle('open');
+    });
+
+    // Автозаполнение формы из localStorage
+    ['name', 'phone', 'address'].forEach(id => {
+      const el = document.getElementById(id);
+      el.value = localStorage.getItem(id) || '';
+      el.addEventListener('input', e => {
+        localStorage.setItem(id, e.target.value);
+      });
     });
 
     async function loadProducts() {
@@ -219,6 +232,7 @@
       }
       products = data;
       renderProducts();
+      updateCart();
     }
 
     function renderProducts() {
@@ -253,9 +267,7 @@
       flyingImg.style.top = imgRect.top + 'px';
 
       requestAnimationFrame(() => {
-        flyingImg.style.transform = `translate(${cartRect.left - imgRect.left}px, ${
-          cartRect.top - imgRect.top
-        }px) scale(0.1)`;
+        flyingImg.style.transform = `translate(${cartRect.left - imgRect.left}px, ${cartRect.top - imgRect.top}px) scale(0.1)`;
         flyingImg.style.opacity = '0.5';
       });
 
@@ -279,6 +291,8 @@
       if (cart.length === 0) {
         cartItemsContainer.textContent = 'Корзина пуста';
         totalDiv.textContent = 'Итого: 0 ₸';
+        cartIcon.textContent = '🛒';
+        localStorage.setItem('cart', JSON.stringify(cart));
         return;
       }
 
@@ -297,51 +311,72 @@
         cartItemsContainer.appendChild(div);
       });
 
-      cartItemsContainer.querySelectorAll('button').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const id = parseInt(btn.dataset.id);
-          const delta = parseInt(btn.dataset.delta);
-          changeQty(id, delta);
-        });
-      });
+      cartItemsContainer.querySelectorAll('button').forEach(btn
+=> {
+btn.addEventListener('click', () => {
+const id = parseInt(btn.dataset.id);
+const delta = parseInt(btn.dataset.delta);
+changeQty(id, delta);
+});
+});
+        const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+  totalDiv.textContent = `Итого: ${total} ₸`;
 
-      const totalPrice = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
-      totalDiv.textContent = `Итого: ${totalPrice} ₸`;
-    }
+  const totalQty = cart.reduce((sum, i) => sum + i.qty, 0);
+  cartIcon.textContent = `🛒${totalQty > 0 ? ' ' + totalQty : ''}`;
 
-    function changeQty(productId, delta) {
-      const item = cart.find(i => i.id === productId);
-      if (!item) return;
-      item.qty += delta;
-      if (item.qty <= 0) {
-        cart = cart.filter(i => i.id !== productId);
-      }
-      updateCart();
-    }
+  localStorage.setItem('cart', JSON.stringify(cart));
+}
 
-    orderForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const name = document.getElementById('name').value.trim();
-      const phone = document.getElementById('phone').value.trim();
-      const address = document.getElementById('address').value.trim();
-      const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
-      const productsList = cart.map(i => `${i.name} x${i.qty}`).join(', ');
+function changeQty(id, delta) {
+  const item = cart.find(i => i.id === id);
+  if (!item) return;
+  item.qty += delta;
+  if (item.qty <= 0) {
+    cart = cart.filter(i => i.id !== id);
+  }
+  updateCart();
+}
 
-      const { error } = await supabase.from('orders').insert([
-        { name, phone, address, products: productsList, total }
-      ]);
+orderForm.addEventListener('submit', e => {
+  e.preventDefault();
+  if (cart.length === 0) {
+    alert('Корзина пуста!');
+    return;
+  }
 
-      if (error) {
-        messageDiv.textContent = 'Ошибка при отправке заказа.';
-      } else {
-        messageDiv.textContent = 'Заказ успешно отправлен!';
-        cart = [];
-        updateCart();
-        orderForm.reset();
-      }
-    });
+  const name = document.getElementById('name').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const address = document.getElementById('address').value.trim();
 
-    loadProducts();
-  </script>
-</body>
-</html>
+  if (!name || !phone || !address) {
+    alert('Заполните все поля!');
+    return;
+  }
+
+  const productsList = cart.map(item => `${item.name} x${item.qty}`).join(', ');
+  const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+  const message = `Заказ от ${name}\nТелефон: ${phone}\nАдрес: ${address}\nТовары: ${productsList}\nИтого: ${total} ₸`;
+
+  // Сюда можно добавить отправку на сервер, например fetch
+
+  // Для демонстрации просто показываем сообщение
+  messageDiv.textContent = 'Заказ успешно отправлен!';
+
+  // Очистка корзины и localStorage
+  cart = [];
+  updateCart();
+
+  localStorage.removeItem('cart');
+  ['name', 'phone', 'address'].forEach(id => localStorage.removeItem(id));
+  ['name', 'phone', 'address'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+
+  setTimeout(() => {
+    messageDiv.textContent = '';
+  }, 4000);
+});
+
+loadProducts();
+</script> </body> </html> ```
