@@ -50,13 +50,6 @@
     button:hover {
       background: #21867a;
     }
-cart.push({
-  id: product.id,
-  name: product.name,
-  price: product.price,
-  qty: 1,
-  unit: product.unit  // <-- вот эта строка!
-});
 
     #cart-toggle {
       position: fixed;
@@ -332,7 +325,7 @@ cart.push({
     }
 
     const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0)
-    const productsText = cart.map(item => `${item.name} (${item.price} ₸) — ${item.qty} ${item.unit}`).join('\n');
+    const productsText = cart.map(item => `${item.name} (${item.price} ₸) — ${item.qty}`).join('\n')
 
     messageDiv.textContent = 'Отправка заказа...'
     const { error } = await supabase.from('orders').insert([{ name, phone, address, products: productsText, total }])
