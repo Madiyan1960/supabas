@@ -187,7 +187,9 @@
   <form id="orderForm">
     <input type="text" id="name" placeholder="Имя" required />
     <input type="tel" id="phone" placeholder="Телефон" required />
-    <textarea id="address" placeholder="Адрес проживания" rows="2" required></textarea>
+    <input id="address" type="text" placeholder="Адрес проживания" required autocomplete="off" />
+
+    
     <button type="submit">Отправить заказ</button>
   </form>
   <div id="message"></div>
