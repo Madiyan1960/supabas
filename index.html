@@ -8,7 +8,7 @@
     body {
       font-family: sans-serif;
       margin: 0;
-      padding-top: 260px; /* пространство под фиксированную корзину */
+      padding-top: 60px; /* место под иконку корзины */
       background: #f5f5f5;
     }
 
@@ -21,6 +21,7 @@
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
       gap: 10px;
+      padding: 10px;
     }
 
     .product-card {
@@ -68,19 +69,40 @@
       cursor: pointer;
     }
 
-    #cart {
+    #cartIcon {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: #2a9d8f;
+      color: #fff;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      cursor: pointer;
+      z-index: 1001;
+    }
+
+    #cartPanel {
       position: fixed;
       top: 0;
-      left: 0;
-      right: 0;
+      right: -100%;
       width: 100%;
-      max-width: 500px;
-      margin: auto;
+      max-width: 400px;
+      height: 100%;
       background: #fff;
-      padding: 15px;
-      border-bottom: 2px solid #ccc;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+      transition: right 0.3s ease;
       z-index: 1000;
+      padding: 15px;
+      overflow-y: auto;
+    }
+
+    #cartPanel.open {
+      right: 0;
     }
 
     .cart-item {
@@ -147,8 +169,11 @@
   </style>
 </head>
 <body>
+  <div id="cartIcon">🛒</div>
+
   <h1>Магазин</h1>
-  <div id="cart">
+
+  <div id="cartPanel">
     <h2>Корзина</h2>
     <div id="cartItems">Корзина пуста</div>
     <div id="total">Итого: 0 ₸</div>
@@ -176,9 +201,15 @@
     const totalDiv = document.getElementById('total');
     const orderForm = document.getElementById('orderForm');
     const messageDiv = document.getElementById('message');
+    const cartIcon = document.getElementById('cartIcon');
+    const cartPanel = document.getElementById('cartPanel');
 
     let products = [];
     let cart = [];
+
+    cartIcon.addEventListener('click', () => {
+      cartPanel.classList.toggle('open');
+    });
 
     async function loadProducts() {
       const { data, error } = await supabase.from('products').select('*');
@@ -216,7 +247,7 @@
       document.body.appendChild(flyingImg);
 
       const imgRect = img.getBoundingClientRect();
-      const cartRect = document.getElementById('cart').getBoundingClientRect();
+      const cartRect = cartIcon.getBoundingClientRect();
 
       flyingImg.style.left = imgRect.left + 'px';
       flyingImg.style.top = imgRect.top + 'px';
