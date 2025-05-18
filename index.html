@@ -51,17 +51,22 @@
       background: #21867a;
     }
 
-   #cart-toggle {
+  #cart-toggle {
+  position: fixed;   /* фиксируем кнопку относительно окна браузера */
+  top: 10px;         /* отступ сверху */
+  right: 10px;       /* отступ справа */
   display: flex;
-  flex-direction: column; /* Вертикальное расположение */
-  align-items: center;    /* Выравнивание по центру по горизонтали */
+  flex-direction: column;
+  align-items: center;
   background: #ffeb3b;
   border-radius: 8px;
   padding: 6px;
   cursor: pointer;
   border: none;
-  gap: 4px; /* Расстояние между иконкой и текстом */
+  gap: 4px;
+  z-index: 1001;     /* чтобы кнопка была поверх остального */
 }
+
 
 #cart-toggle img {
   width: 40px;
