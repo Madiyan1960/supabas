@@ -188,7 +188,9 @@
   <div id="total">Итого: 0</div>
   <form id="orderForm">
     <input type="text" id="name" placeholder="Имя" required />
-    <input type="tel" id="phone" placeholder="Телефон" required />
+    <input type="tel" id="phone" placeholder="Телефон" required pattern="^\+?\d{10,15}$" title="Введите корректный номер телефона" />
+
+    
     <input id="address" type="text" placeholder="Адрес проживания" required autocomplete="on" />
 
     
