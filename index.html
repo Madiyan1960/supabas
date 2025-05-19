@@ -282,8 +282,8 @@
   <img src="${p.image_url || ''}" alt="${p.name}" />
   <div class="product-name">${p.name}</div>
   <div class="product-price">${p.price} ₸</div>
-  <button class="btn-increase" data-id="123">+</button>
-
+  <button class="add-to-cart" data-id="${p.id}">+</button>
+`
 
       
       card.querySelector('button').addEventListener('click', () => {
@@ -306,28 +306,6 @@
     }
     updateCartUI()
   }
-cartItemsContainer.addEventListener('click', e => {
-  if (e.target.classList.contains('inc')) {
-    const id = e.target.dataset.id
-    const item = cart.find(p => p.id === id)
-    if (item) {
-      item.qty++
-      updateCartUI()
-    }
-  }
-
-  if (e.target.classList.contains('dec')) {
-    const id = e.target.dataset.id
-    const item = cart.find(p => p.id === id)
-    if (item) {
-      item.qty--
-      if (item.qty <= 0) {
-        cart = cart.filter(p => p.id !== id)
-      }
-      updateCartUI()
-    }
-  }
-})
 
   function flyToCart(imgElement) {
     const cartIcon = document.querySelector('#cart-icon')
@@ -362,19 +340,19 @@ cartItemsContainer.addEventListener('click', e => {
     return
   }
   cartItemsContainer.innerHTML = ''
-cart.forEach(item => {
-  const div = document.createElement('div')
-  div.className = 'cart-item'
-  div.innerHTML = `
-    <div class="cart-item-name">${item.name} (${item.price} ₸)</div>
-    <div class="cart-item-qty">
-      <button class="dec" data-id="${item.id}">-</button>
-      <div>${item.qty}</div>
-      <button class="inc" data-id="${item.id}">+</button>
-    </div>
-  ` // ← здесь закрыта шаблонная строка
-  cartItemsContainer.appendChild(div)
-})
+  cart.forEach(item => {
+    const div = document.createElement('div')
+    div.className = 'cart-item'
+    div.innerHTML = `
+      <div class="cart-item-name">${item.name} (${item.price} ₸)</div>
+      <div class="cart-item-qty">
+        <button class="dec" data-id="${item.id}">-</button>
+        <div>${item.qty}</div>
+        <button class="inc" data-id="${item.id}">+</button>
+      </div>
+    `
+    cartItemsContainer.appendChild(div)
+  })
 
   // Не забудь обновить сумму
   const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0)
