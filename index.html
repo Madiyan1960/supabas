@@ -403,8 +403,7 @@
     const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0)
     const productsText = cart.map(item => {
   const total = (item.price * item.qty).toFixed(1)  // итоговая сумма с 2 знаками после запятой
-  return ${item.name} ${item.price} ₸ х ${item.qty} ${item.unit} = ${total} ₸
-}).join('\n')
+  return ${item.name} ${item.price} ₸ х ${item.qty} ${item.unit} = ${total} ₸ }).join('\n')
 
 
     messageDiv.textContent = 'Отправка заказа...'
