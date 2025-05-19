@@ -117,8 +117,7 @@ function addToCart(productId) {
   if (item) {
     item.qty++;
   } else {
-    cart.push(Object.assign({}, product, { qty: 1 }));
-
+    cart.push({...product, qty: 1});
   }
   updateCartUI();
 }
@@ -173,8 +172,7 @@ function updateCartUI() {
   totalDiv.textContent = `Итого: ${total} ₸`;
 
   cartItemsContainer.querySelectorAll('button.inc').forEach(btn => {
-   btn.onclick = () => { ... }
-
+    btn.onclick = () => {
       const id = btn.getAttribute('data-id');
       const item = cart.find(c => c.id == id);
       if (item) {
