@@ -362,19 +362,19 @@ cartItemsContainer.addEventListener('click', e => {
     return
   }
   cartItemsContainer.innerHTML = ''
-  cart.forEach(item => {
-    const div = document.createElement('div')
-    div.className = 'cart-item'
-    div.innerHTML = `
-      <div class="cart-item-name">${item.name} (${item.price} ₸)</div>
-      <div class="cart-item-qty">
-        <button class="dec" data-id="${item.id}">-</button>
-        <div>${item.qty}</div>
-        <button class="inc" data-id="${item.id}">+</button>
-      </div>
-    `
-    cartItemsContainer.appendChild(div)
-  })
+cart.forEach(item => {
+  const div = document.createElement('div')
+  div.className = 'cart-item'
+  div.innerHTML = `
+    <div class="cart-item-name">${item.name} (${item.price} ₸)</div>
+    <div class="cart-item-qty">
+      <button class="dec" data-id="${item.id}">-</button>
+      <div>${item.qty}</div>
+      <button class="inc" data-id="${item.id}">+</button>
+    </div>
+  ` // ← здесь закрыта шаблонная строка
+  cartItemsContainer.appendChild(div)
+})
 
   // Не забудь обновить сумму
   const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0)
