@@ -172,7 +172,8 @@ function updateCartUI() {
   totalDiv.textContent = `Итого: ${total} ₸`;
 
   cartItemsContainer.querySelectorAll('button.inc').forEach(btn => {
-   btn.addEventListener('click', () => { ... });
+   btn.onclick = () => { ... }
+
       const id = btn.getAttribute('data-id');
       const item = cart.find(c => c.id == id);
       if (item) {
