@@ -4,6 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
+  <div id="auth-section" style="margin: 1em 0;">
+  <h3>Авторизация</h3>
+  <input id="phone-input" type="text" placeholder="+77001234567" />
+  <button onclick="sendOTP()">Получить код</button>
+  <div id="otp-section" style="display:none;">
+    <input id="otp-input" type="text" placeholder="Введите код" />
+    <button onclick="verifyOTP()">Подтвердить</button>
+  </div>
+  <div id="auth-status"></div>
+</div>
   
   <title>Магазин на Supabase</title>
   <link rel="manifest" href="manifest.json" />
