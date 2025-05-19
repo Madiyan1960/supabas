@@ -284,7 +284,7 @@
         <div class="product-name">${p.name}</div>
         <div class="product-price">${p.price} ₸</div>
         <button class="add-to-cart" data-id="${p.id}">+</button>
-      `<div class="price-block"> <span class="price">${p.price} ₸</span> <button class="add-to-cart" data-id="${p.id}">+</button> </div>
+      `
       card.querySelector('button').addEventListener('click', () => {
         addToCart(p.id)
         const img = card.querySelector('img')
