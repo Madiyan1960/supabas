@@ -283,7 +283,7 @@
         <img src="${p.image_url || ''}" alt="${p.name}" />
         <div class="product-name">${p.name}</div>
         <div class="product-price">${p.price} ₸</div>
-        <button data-id="${p.id}">Добавить в корзину</button>
+        <button class="add-to-cart" data-id="${p.id}">+</button>
       `
       card.querySelector('button').addEventListener('click', () => {
         addToCart(p.id)
