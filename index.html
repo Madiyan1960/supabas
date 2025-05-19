@@ -2,7 +2,9 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
   <title>Магазин на Supabase</title>
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#2a9d8f" />
@@ -10,18 +12,26 @@
   <style>
     body { font-family: Arial, sans-serif; margin: 10px; background: #f9f9f9; }
     h1 { text-align: center; }
+
     #products {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
       gap: 10px;
       justify-content: center;
     }
-    @media (max-width: 600px) {
-      #products { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (min-width: 601px) and (max-width: 900px) {
-      #products { grid-template-columns: repeat(3, 1fr); }
-    }
+@media (max-width: 600px) {
+  #products {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 601px) and (max-width: 900px) {
+  #products {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+
     .product-card {
       border: 1px solid #ddd;
       border-radius: 5px;
@@ -54,30 +64,42 @@
     button:hover {
       background: #21867a;
     }
+
+  #cart-toggle {
+  position: fixed;   /* фиксируем кнопку относительно окна браузера */
+  top: 10px;         /* отступ сверху */
+  right: 10px;       /* отступ справа */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #ffeb3b;
+  border-radius: 8px;
+  padding: 3px;
+  cursor: pointer;
+  border: none;
+  gap: 4px;
+  z-index: 1001;     /* чтобы кнопка была поверх остального */
+}
+
+
+#cart-toggle img {
+  width: 40px;
+  height: 40px;
+  display: block;
+}
+
+#cart-text {
+  font-size: 12px;
+  color: black;
+}
+
+
     #cart-toggle {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background: #ffeb3b;
-      border-radius: 8px;
-      padding: 3px;
-      cursor: pointer;
-      border: none;
-      gap: 4px;
-      z-index: 1001;
-    }
-    #cart-toggle img {
-      width: 40px;
-      height: 40px;
-      display: block;
-    }
-    #cart-text {
-      font-size: 12px;
-      color: black;
-    }
+  background: #ffeb3b; /* цвет фона кнопки */
+  border-radius: 8px; /* можно скруглить углы */
+  padding: 3px; /* отступы вокруг иконки */
+}
+
     #cart {
       width: 90vw;
       max-width: 320px;
@@ -96,13 +118,12 @@
       transform: translateX(100%);
       z-index: 1000;
     }
+
     #cart.open {
       transform: translateX(0);
     }
-    #cart h2 {
-      margin-top: 0;
-      text-align: center;
-    }
+
+    #cart h2 { margin-top: 0; text-align: center; }
     .cart-item {
       display: flex;
       justify-content: space-between;
@@ -111,9 +132,7 @@
       border-bottom: 1px solid #eee;
       padding-bottom: 5px;
     }
-    .cart-item-name {
-      flex: 1 1 auto;
-    }
+    .cart-item-name { flex: 1 1 auto; }
     .cart-item-qty {
       display: flex;
       align-items: center;
@@ -126,13 +145,6 @@
       padding: 0;
       line-height: 1;
       border-radius: 4px;
-      background: #2a9d8f;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    .cart-item-qty button:hover {
-      background: #21867a;
     }
     #total {
       font-weight: bold;
@@ -155,15 +167,6 @@
     #orderForm button {
       width: 100%;
       font-size: 16px;
-      background: #2a9d8f;
-      color: white;
-      border: none;
-      padding: 8px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    #orderForm button:hover {
-      background: #21867a;
     }
     #message {
       text-align: center;
@@ -171,16 +174,16 @@
       margin-top: 8px;
     }
     h3 {
-      text-align: left;
-      margin-top: 5px;
-      font-size: 24px;
-      color: #ed2d5a;
-    }
+  text-align: left;
+  margin-top: 5px;
+  font-size: 24px;
+  color: #ed2d5a;
+}
   </style>
 </head>
 <body>
 
-<h3>Магазин<br> "Меруерт"</h3>
+<h3>Магазин<br>    "Меруерт"</h3>
 
 <div id="products">Загрузка товаров...</div>
 
@@ -189,6 +192,7 @@
   <span id="cart-text">Открыть/закрыть корзину</span>
 </button>
 
+
 <div id="cart">
   <h2>Корзина</h2>
   <div id="cartItems">Корзина пуста</div>
@@ -196,7 +200,11 @@
   <form id="orderForm">
     <input type="text" id="name" placeholder="Имя" required />
     <input type="tel" id="phone" placeholder="Телефон" required pattern="^\+?\d{10,15}$" title="Введите корректный номер телефона" />
+
+    
     <input id="address" type="text" placeholder="Адрес проживания" required autocomplete="on" />
+
+    
     <button type="submit">Отправить заказ</button>
   </form>
   <div id="message"></div>
@@ -218,141 +226,211 @@
   const cartPanel = document.getElementById('cart')
   const toggleButton = document.getElementById('cart-toggle')
 
-  // Загрузка сохранённых данных формы из localStorage
-  window.addEventListener("DOMContentLoaded", () => {
-    const nameInput = document.getElementById("name");
-    const phoneInput = document.getElementById("phone");
-    const addressInput = document.getElementById("address");
+    window.addEventListener("DOMContentLoaded", function () {
+      const nameInput = document.getElementById("name");
+      const phoneInput = document.getElementById("phone");
+      const addressInput = document.getElementById("address");
 
-    nameInput.value = localStorage.getItem("name") || "";
-    phoneInput.value = localStorage.getItem("phone") || "";
-    addressInput.value = localStorage.getItem("address") || "";
+      // Загрузка сохранённых данных
+      nameInput.value = localStorage.getItem("name") || "";
+      phoneInput.value = localStorage.getItem("phone") || "";
+      addressInput.value = localStorage.getItem("address") || "";
 
-    nameInput.addEventListener("input", () => {
-      localStorage.setItem("name", nameInput.value);
+      // Сохранение при вводе
+      nameInput.addEventListener("input", () => {
+        localStorage.setItem("name", nameInput.value);
+      });
+
+      phoneInput.addEventListener("input", () => {
+        localStorage.setItem("phone", phoneInput.value);
+      });
+
+      addressInput.addEventListener("input", () => {
+        localStorage.setItem("address", addressInput.value);
+      });
     });
-    phoneInput.addEventListener("input", () => {
-      localStorage.setItem("phone", phoneInput.value);
-    });
-    addressInput.addEventListener("input", () => {
-      localStorage.setItem("address", addressInput.value);
-   
-});
-});
-
-let cart = JSON.parse(localStorage.getItem('cart')) || []
-
-function saveCart() {
-localStorage.setItem('cart', JSON.stringify(cart))
-}
-
-function renderCart() {
-cartItemsContainer.innerHTML = ''
-if (cart.length === 0) {
-cartItemsContainer.innerHTML = 'Корзина пуста'
-} else {
-cart.forEach((item, index) => {
-const div = document.createElement('div')
-div.className = 'cart-item'
-div.innerHTML = <span class="cart-item-name">${index + 1}. ${item.name}</span> <div class="cart-item-qty"> <button class="minus" data-id="${item.id}">−</button> ${item.quantity} <button class="plus" data-id="${item.id}">+</button> </div>
-cartItemsContainer.appendChild(div)
-})
-}
-const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
-totalDiv.textContent = 'Итого: ' + total.toFixed(2) + ' ₸'
-saveCart()
-}
-
-function addToCart(product) {
-const existing = cart.find(item => item.id === product.id)
-if (existing) {
-existing.quantity++
-} else {
-cart.push({ ...product, quantity: 1 })
-}
-renderCart()
-}
-
-toggleButton.addEventListener('click', () => {
-cartPanel.classList.toggle('open')
-})
-
-cartItemsContainer.addEventListener('click', e => {
-if (e.target.classList.contains('plus')) {
-const id = e.target.dataset.id
-const item = cart.find(i => i.id == id)
-item.quantity++
-renderCart()
-} else if (e.target.classList.contains('minus')) {
-const id = e.target.dataset.id
-const item = cart.find(i => i.id == id)
-item.quantity--
-if (item.quantity <= 0) {
-cart = cart.filter(i => i.id != id)
-}
-renderCart()
-}
-})
-
-orderForm.addEventListener('submit', async e => {
-e.preventDefault()
-const name = document.getElementById('name').value
-const phone = document.getElementById('phone').value
-const address = document.getElementById('address').value
-const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
-const productList = cart.map(item => ${item.name} x${item.quantity}).join(', ')
-  const { error } = await supabase.from('orders').insert([
-  { name, phone, address, products: productList, total }
-])
-
-if (error) {
-  messageDiv.textContent = 'Ошибка при отправке заказа'
-  messageDiv.style.color = 'red'
-} else {
-  messageDiv.textContent = 'Заказ успешно отправлен!'
-  messageDiv.style.color = 'green'
-  cart = []
-  renderCart()
-  orderForm.reset()
-  localStorage.removeItem('cart')
-}
-})
-
-const { data, error } = await supabase.from('products').select('*')
-if (error) {
-productsContainer.textContent = 'Ошибка загрузки товаров'
-} else {
-productsContainer.innerHTML = ''
-data.forEach(product => {
-const div = document.createElement('div')
-div.className = 'product-card'
-div.innerHTML = <img src="${product.image}" alt="${product.name}" /> <div class="product-name">${product.name}</div> <div class="product-price">${product.price} ₸</div> <button data-id="${product.id}">В корзину</button>
-div.querySelector('button').addEventListener('click', () => {
-const img = div.querySelector('img')
-const clone = img.cloneNode(true)
-const rect = img.getBoundingClientRect()
-clone.style.position = 'fixed'
-clone.style.left = rect.left + 'px'
-clone.style.top = rect.top + 'px'
-clone.style.width = rect.width + 'px'
-clone.style.height = rect.height + 'px'
-clone.style.transition = 'all 1s ease'
-clone.style.zIndex = '1000'
-document.body.appendChild(clone)
-setTimeout(() => {
-clone.style.left = toggleButton.getBoundingClientRect().left + 'px'
-clone.style.top = toggleButton.getBoundingClientRect().top + 'px'
-clone.style.opacity = 0
-clone.style.transform = 'scale(0.2)'
-}, 10)
-setTimeout(() => document.body.removeChild(clone), 1000)
-      addToCart(product)
+  
+  toggleButton.addEventListener('click', () => {
+    cartPanel.classList.toggle('open')
   })
-  productsContainer.appendChild(div)
-})
+
+  let products = []
+  let cart = []
+
+  async function loadProducts() {
+    productsContainer.textContent = 'Загрузка товаров...'
+    const { data, error } = await supabase.from('products').select('id,name,price,image_url,unit')
+    if (error) {
+      productsContainer.textContent = 'Ошибка загрузки товаров'
+      console.error(error)
+      return
+    }
+    products = data
+    renderProducts()
+  }
+
+  function renderProducts() {
+    if (!products.length) {
+      productsContainer.textContent = 'Нет товаров'
+      return
+    }
+    productsContainer.innerHTML = ''
+    products.forEach(p => {
+      const card = document.createElement('div')
+      card.className = 'product-card'
+     card.innerHTML = `
+  <img src="${p.image_url || ''}" alt="${p.name}" />
+  <div class="product-name">${p.name}</div>
+  <div class="product-price">${p.price} ₸</div>
+  <button class="add-to-cart" data-id="${p.id}">+</button>
+`
+
+      
+      card.querySelector('button').addEventListener('click', () => {
+        addToCart(p.id)
+        const img = card.querySelector('img')
+        if (img) flyToCart(img)
+      })
+      productsContainer.appendChild(card)
+    })
+  }
+
+  function addToCart(productId) {
+    const product = products.find(p => p.id === productId)
+    if (!product) return
+    const item = cart.find(c => c.id === productId)
+    if (item) {
+      item.qty++
+    } else {
+      cart.push({ ...product, qty: 1 })
+    }
+    updateCartUI()
+  }
+
+  function flyToCart(imgElement) {
+    const cartIcon = document.querySelector('#cart-icon')
+    const imgClone = imgElement.cloneNode(true)
+    const imgRect = imgElement.getBoundingClientRect()
+    const cartRect = cartIcon.getBoundingClientRect()
+
+    imgClone.style.position = 'fixed'
+    imgClone.style.zIndex = '9999'
+    imgClone.style.left = imgRect.left + 'px'
+    imgClone.style.top = imgRect.top + 'px'
+    imgClone.style.width = imgRect.width + 'px'
+    imgClone.style.transition = 'all 0.8s ease-in-out'
+    document.body.appendChild(imgClone)
+
+    requestAnimationFrame(() => {
+      imgClone.style.left = cartRect.left + 'px'
+      imgClone.style.top = cartRect.top + 'px'
+      imgClone.style.width = '20px'
+      imgClone.style.opacity = '0.5'
+    })
+
+    setTimeout(() => {
+      imgClone.remove()
+    }, 800)
+  }
+
+  function updateCartUI() {
+  if (cart.length === 0) {
+    cartItemsContainer.textContent = 'Корзина пуста'
+    totalDiv.textContent = 'Итого: 0'
+    return
+  }
+  cartItemsContainer.innerHTML = ''
+  cart.forEach(item => {
+    const div = document.createElement('div')
+    div.className = 'cart-item'
+    div.innerHTML = `
+      <div class="cart-item-name">${item.name} (${item.price} ₸)</div>
+      <div class="cart-item-qty">
+        <button class="dec" data-id="${item.id}">-</button>
+        <div>${item.qty}</div>
+        <button class="inc" data-id="${item.id}">+</button>
+      </div>
+    `
+    cartItemsContainer.appendChild(div)
+  })
+
+  // Не забудь обновить сумму
+  const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0)
+  totalDiv.textContent = `Итого: ${total} ₸`
 }
 
-renderCart()
-</script>
+    cartItemsContainer.querySelectorAll('button.inc').forEach(btn => {
+      btn.onclick = () => {
+        const id = btn.getAttribute('data-id')
+        const item = cart.find(c => c.id == id)
+        if (item) {
+          item.qty++
+          updateCartUI()
+        }
+      }
+    })
+    cartItemsContainer.querySelectorAll('button.dec').forEach(btn => {
+      btn.onclick = () => {
+        const id = btn.getAttribute('data-id')
+        const item = cart.find(c => c.id == id)
+        if (item) {
+          item.qty--
+          if (item.qty <= 0) {
+            cart = cart.filter(c => c.id != id)
+          }
+          updateCartUI()
+        }
+      }
+    })
+ 
 
-</body> </html> ```
+  orderForm.onsubmit = async e => {
+    e.preventDefault()
+    if (cart.length === 0) {
+      alert('Корзина пуста!')
+      return
+    }
+
+    const name = document.getElementById('name').value.trim()
+    const phone = document.getElementById('phone').value.trim()
+    const address = document.getElementById('address').value.trim()
+
+    if (!name || !phone || !address) {
+      alert('Пожалуйста, заполните все поля.')
+      return
+    }
+
+    const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0)
+    const productsText = cart.map(item => {
+  const total = (item.price * item.qty).toFixed(1)
+  return `${item.name} ${item.price} ₸ х ${item.qty} ${item.unit} = ${total} ₸`
+}).join('\n')
+
+
+    messageDiv.textContent = 'Отправка заказа...'
+    const { error } = await supabase.from('orders').insert([{ name, phone, address, products: productsText, total }])
+
+    if (error) {
+      messageDiv.style.color = 'red'
+      messageDiv.textContent = 'Ошибка при отправке заказа: ' + error.message
+    } else {
+      messageDiv.style.color = 'green'
+      messageDiv.textContent = 'Заказ успешно отправлен! Спасибо.'
+      cart = []
+      updateCartUI()
+      orderForm.reset()
+    }
+  }
+
+  loadProducts()
+  updateCartUI()
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js')
+      .then(() => console.log('✅ Service Worker зарегистрирован'))
+      .catch(e => console.error('❌ Ошибка регистрации Service Worker:', e))
+  }
+</script>
+ 
+</body>
+</html>
