@@ -117,7 +117,8 @@ function addToCart(productId) {
   if (item) {
     item.qty++;
   } else {
-    cart.push({...product, qty: 1});
+    cart.push(Object.assign({}, product, { qty: 1 }));
+
   }
   updateCartUI();
 }
