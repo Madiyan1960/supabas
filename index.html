@@ -221,6 +221,54 @@
 </div>
 
 <script type="module">
+
+
+  
+const authSection = document.getElementById('auth-section');
+const otpSection = document.getElementById('otp-section');
+const authStatus = document.getElementById('auth-status');
+
+let userPhone = '';
+let session = null;
+
+window.sendOTP = async () => {
+  userPhone = document.getElementById('phone-input').value.trim();
+  if (!userPhone.startsWith('+')) {
+    authStatus.textContent = 'Введите номер в формате +7XXXXXXXXXX';
+    return;
+  }
+
+  const { error } = await supabase.auth.signInWithOtp({ phone: userPhone });
+
+  if (error) {
+    authStatus.textContent = 'Ошибка: ' + error.message;
+  } else {
+    authStatus.textContent = 'Код отправлен. Проверьте SMS.';
+    otpSection.style.display = 'block';
+  }
+};
+
+window.verifyOTP = async () => {
+  const otpCode = document.getElementById('otp-input').value.trim();
+  const { data, error } = await supabase.auth.verifyOtp({
+    phone: userPhone,
+    token: otpCode,
+    type: 'sms',
+  });
+
+  if (error) {
+    authStatus.textContent = 'Ошибка проверки: ' + error.message;
+  } else {
+    authStatus.textContent = 'Успешная авторизация!';
+    session = data.session;
+    localStorage.setItem('auth_user', JSON.stringify(data.user));
+    authSection.style.display = 'none';
+  }
+};
+
+
+
+  
   import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
   const SUPABASE_URL = 'https://kpefeonxvgnfpgevkcwy.supabase.co'
@@ -228,6 +276,20 @@
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
+
+
+
+  supabase.auth.getSession().then(({ data: { session } }) => {
+  if (session) {
+    authSection.style.display = 'none';
+    console.log('Пользователь уже авторизован:', session.user);
+  } else {
+    authSection.style.display = 'block';
+  }
+});
+
+
+  
   const productsContainer = document.getElementById('products')
   const cartItemsContainer = document.getElementById('cartItems')
   const totalDiv = document.getElementById('total')
