@@ -306,6 +306,28 @@
     }
     updateCartUI()
   }
+cartItemsContainer.addEventListener('click', e => {
+  if (e.target.classList.contains('inc')) {
+    const id = e.target.dataset.id
+    const item = cart.find(p => p.id === id)
+    if (item) {
+      item.qty++
+      updateCartUI()
+    }
+  }
+
+  if (e.target.classList.contains('dec')) {
+    const id = e.target.dataset.id
+    const item = cart.find(p => p.id === id)
+    if (item) {
+      item.qty--
+      if (item.qty <= 0) {
+        cart = cart.filter(p => p.id !== id)
+      }
+      updateCartUI()
+    }
+  }
+})
 
   function flyToCart(imgElement) {
     const cartIcon = document.querySelector('#cart-icon')
