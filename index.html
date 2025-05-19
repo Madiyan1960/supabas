@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  
   <title>Магазин на Supabase</title>
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#2a9d8f" />
@@ -13,16 +12,7 @@
   <style>
     body { font-family: Arial, sans-serif; margin: 10px; background: #f9f9f9; }
     h1 { text-align: center; }
-<div id="auth-section" style="margin: 1em 0;">
-  <h3>Авторизация</h3>
-  <input id="phone-input" type="text" placeholder="+77001234567" />
-  <button onclick="sendOTP()">Получить код</button>
-  <div id="otp-section" style="display:none;">
-    <input id="otp-input" type="text" placeholder="Введите код" />
-    <button onclick="verifyOTP()">Подтвердить</button>
-  </div>
-  <div id="auth-status"></div>
-</div>
+
     #products {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -221,54 +211,6 @@
 </div>
 
 <script type="module">
-
-
-  
-const authSection = document.getElementById('auth-section');
-const otpSection = document.getElementById('otp-section');
-const authStatus = document.getElementById('auth-status');
-
-let userPhone = '';
-let session = null;
-
-window.sendOTP = async () => {
-  userPhone = document.getElementById('phone-input').value.trim();
-  if (!userPhone.startsWith('+')) {
-    authStatus.textContent = 'Введите номер в формате +7XXXXXXXXXX';
-    return;
-  }
-
-  const { error } = await supabase.auth.signInWithOtp({ phone: userPhone });
-
-  if (error) {
-    authStatus.textContent = 'Ошибка: ' + error.message;
-  } else {
-    authStatus.textContent = 'Код отправлен. Проверьте SMS.';
-    otpSection.style.display = 'block';
-  }
-};
-
-window.verifyOTP = async () => {
-  const otpCode = document.getElementById('otp-input').value.trim();
-  const { data, error } = await supabase.auth.verifyOtp({
-    phone: userPhone,
-    token: otpCode,
-    type: 'sms',
-  });
-
-  if (error) {
-    authStatus.textContent = 'Ошибка проверки: ' + error.message;
-  } else {
-    authStatus.textContent = 'Успешная авторизация!';
-    session = data.session;
-    localStorage.setItem('auth_user', JSON.stringify(data.user));
-    authSection.style.display = 'none';
-  }
-};
-
-
-
-  
   import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
   const SUPABASE_URL = 'https://kpefeonxvgnfpgevkcwy.supabase.co'
@@ -276,20 +218,6 @@ window.verifyOTP = async () => {
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-
-
-
-  supabase.auth.getSession().then(({ data: { session } }) => {
-  if (session) {
-    authSection.style.display = 'none';
-    console.log('Пользователь уже авторизован:', session.user);
-  } else {
-    authSection.style.display = 'block';
-  }
-});
-
-
-  
   const productsContainer = document.getElementById('products')
   const cartItemsContainer = document.getElementById('cartItems')
   const totalDiv = document.getElementById('total')
@@ -350,12 +278,12 @@ window.verifyOTP = async () => {
     products.forEach(p => {
       const card = document.createElement('div')
       card.className = 'product-card'
-      card.innerHTML = `
+      card.innerHTML = 
         <img src="${p.image_url || ''}" alt="${p.name}" />
         <div class="product-name">${p.name}</div>
         <div class="product-price">${p.price} ₸</div>
         <button class="add-to-cart" data-id="${p.id}">+</button>
-      `
+      
       card.querySelector('button').addEventListener('click', () => {
         addToCart(p.id)
         const img = card.querySelector('img')
@@ -413,19 +341,19 @@ window.verifyOTP = async () => {
     cart.forEach(item => {
       const div = document.createElement('div')
       div.className = 'cart-item'
-      div.innerHTML = `
+      div.innerHTML = 
         <div class="cart-item-name">${item.name} (${item.price} ₸)</div>
         <div class="cart-item-qty">
           <button class="dec" data-id="${item.id}">-</button>
           <div>${item.qty}</div>
           <button class="inc" data-id="${item.id}">+</button>
         </div>
-      `
+      
       cartItemsContainer.appendChild(div)
     })
 
     const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0)
-    totalDiv.textContent = `Итого: ${total} ₸`
+    totalDiv.textContent = Итого: ${total} ₸
 
     cartItemsContainer.querySelectorAll('button.inc').forEach(btn => {
       btn.onclick = () => {
@@ -471,7 +399,7 @@ window.verifyOTP = async () => {
     const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0)
     const productsText = cart.map(item => {
   const total = (item.price * item.qty).toFixed(1)  // итоговая сумма с 2 знаками после запятой
-  return `${item.name} ${item.price} ₸ х ${item.qty} ${item.unit} = ${total} ₸`
+  return ${item.name} ${item.price} ₸ х ${item.qty} ${item.unit} = ${total} ₸
 }).join('\n')
 
 
@@ -498,39 +426,6 @@ window.verifyOTP = async () => {
       .then(() => console.log('✅ Service Worker зарегистрирован'))
       .catch(e => console.error('❌ Ошибка регистрации Service Worker:', e))
   }
-  async function sendOTP() {
-  const phone = document.getElementById("phone-input").value;
-  const { error } = await supabase.auth.signInWithOtp({ phone });
-
-  if (error) {
-    document.getElementById("auth-status").innerText = "Ошибка: " + error.message;
-  } else {
-    document.getElementById("auth-status").innerText = "Код отправлен!";
-    document.getElementById("otp-section").style.display = "block";
-  }
-}
-
-  
-async function verifyOTP() {
-  const phone = document.getElementById("phone-input").value;
-  const otp = document.getElementById("otp-input").value;
-
-  const { data, error } = await supabase.auth.verifyOtp({
-    phone,
-    token: otp,
-    type: "sms"  // или "whatsapp", если включено
-  });
-
-  if (error) {
-    document.getElementById("auth-status").innerText = "Ошибка подтверждения: " + error.message;
-  } else {
-    document.getElementById("auth-status").innerText = "Успешно авторизован!";
-    
-    // Сохраняем подтверждённый номер в Supabase
-    await supabase.from("users_confirmed").upsert({ phone });
-  }
-}
-
 </script>
  
 </body>
